@@ -1,0 +1,269 @@
+/* SAMSARA · 윤회 — Design Tokens (Single Source of Truth)
+ *
+ * 모든 색·타입·스페이싱·모션 결정은 여기서만 수정한다.
+ * index.html / src/main.ts / mockup/styles.css 모두 이 파일을 임포트.
+ *
+ * 카테고리:
+ *   1) Color  — palette / surface / tag / rarity / semantic / overlay / glow
+ *   2) Typography — family / size / weight / leading / tracking
+ *   3) Space  — 4-base scale + viewport-aware (sm/md/lg/xl)
+ *   4) Radius — sm/md/lg/pill/full
+ *   5) Elevation — shadow + tag-glow set
+ *   6) Motion — duration / easing
+ *   7) Z-index — 게임 레이어 순서 고정
+ */
+
+:root {
+  /* ─────────── 1) COLOR ─────────── */
+
+  /* Palette — neopunk + 한국 모티브 */
+  --bg:           #0a0a1a;     /* 메인 배경 (네오펑크 다크) */
+  --bg-elevated:  #02010a;     /* 시네마틱 풀스크린 (home/transcend) */
+  --surface:      #14142a;     /* 카드/패널 1단계 */
+  --surface-2:    #1f1f3d;     /* 보더/구분선/패널 2단계 */
+  --surface-3:    #2a2a52;     /* 호버/선택 강조 */
+
+  --text:         #f0f0ff;     /* 본문 (의도적 약 보라톤) */
+  --text-strong:  #ffffff;     /* 헤드라인 / 결정적 강조 */
+  --text-dim:     #8888aa;     /* 보조 / 캡션 */
+  --text-mute:    #5a5a78;     /* 비활성 / 메타 */
+
+  /* Tag colors — 6 element 태그 (cards / weapons / synergies 일관) */
+  --fire:   #ff2a6d;
+  --ice:    #05d9e8;
+  --gold:   #ffd700;
+  --time:   #d300c5;
+  --chaos:  #ff6f00;
+  --echo:   #b3ff00;
+
+  /* Tag colors — 흐림 변형 (배경/보더 등 약하게 사용 시) */
+  --fire-dim:  rgba(255, 42, 109, 0.6);
+  --ice-dim:   rgba(5, 217, 232, 0.6);
+  --gold-dim:  rgba(255, 215, 0, 0.6);
+  --time-dim:  rgba(211, 0, 197, 0.6);
+  --chaos-dim: rgba(255, 111, 0, 0.6);
+  --echo-dim:  rgba(179, 255, 0, 0.6);
+
+  /* Rarity — 카드 등급 */
+  --rare:        #4a90e2;
+  --epic:        #b14aff;
+  --legendary:   #ffaa00;
+  --rarity-c:    var(--text-dim);
+  --rarity-r:    var(--rare);
+  --rarity-e:    var(--epic);
+  --rarity-l:    var(--legendary);
+
+  /* Semantic — 상태 색 */
+  --ok:    #00ff88;
+  --warn:  #ffaa00;
+  --bad:   #ff3366;
+  --info:  var(--ice);
+
+  /* ⭐ 색약 모드 팔레트 — 빨강/시안 → 주황/노랑 (deuteranopia/protanopia 친화) */
+  --cb-fire:  #ff8a2a;
+  --cb-ice:   #fff352;
+  --cb-bad:   #ff8a2a;
+  --cb-info:  #fff352;
+
+  /* Alpha overlay (반투명 오버레이용) */
+  --overlay-soft:    rgba(10, 10, 26, 0.50);
+  --overlay-medium:  rgba(10, 10, 26, 0.75);
+  --overlay-hard:    rgba(10, 10, 26, 0.92);
+  --glass-thin:      rgba(255, 255, 255, 0.04);
+  --glass:           rgba(255, 255, 255, 0.08);
+  --glass-strong:    rgba(255, 255, 255, 0.14);
+
+  /* Gradients (브랜드/강조용) */
+  --grad-brand:  linear-gradient(135deg, var(--fire), var(--ice), var(--gold));
+  --grad-fire:   linear-gradient(135deg, var(--fire), var(--time));
+  --grad-ice:    linear-gradient(135deg, var(--ice), var(--echo));
+  --grad-gold:   linear-gradient(135deg, var(--gold), var(--chaos));
+  --grad-bg:     radial-gradient(ellipse at top, #1a0a2e 0%, var(--bg) 50%, #000 100%);
+  --grad-cinematic: radial-gradient(ellipse at center, #1a0a26 0%, var(--bg) 70%);
+
+  /* ─────────── 2) TYPOGRAPHY ─────────── */
+
+  --font-body:    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+                  system-ui, 'Apple SD Gothic Neo', 'Segoe UI', Roboto, sans-serif;
+  --font-pixel:   'Galmuri11', 'Press Start 2P', 'VT323', monospace;
+  --font-mono:    'Galmuri11', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /* Type scale — 모바일 기본, clamp 로 데스크톱 확대 */
+  --fs-xs:   clamp(10px, 0.85vw, 11px);
+  --fs-sm:   clamp(11px, 1.0vw, 13px);
+  --fs-md:   clamp(13px, 1.2vw, 15px);
+  --fs-base: clamp(14px, 1.3vw, 16px);
+  --fs-lg:   clamp(16px, 1.6vw, 18px);
+  --fs-xl:   clamp(18px, 2.0vw, 22px);
+  --fs-2xl:  clamp(22px, 2.6vw, 32px);
+  --fs-3xl:  clamp(28px, 3.4vw, 44px);
+  --fs-4xl:  clamp(36px, 4.5vw, 56px);
+  --fs-display: clamp(44px, 6.0vw, 80px);
+
+  /* Pixel scale — Galmuri 등 도트폰트는 정수 픽셀 권장 */
+  --fp-8:    8px;
+  --fp-10:   10px;
+  --fp-12:   12px;
+  --fp-14:   14px;
+  --fp-18:   18px;
+  --fp-24:   24px;
+
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-bold:     700;
+  --fw-black:    900;
+
+  --lh-tight:   1.1;
+  --lh-snug:    1.3;
+  --lh-normal:  1.5;
+  --lh-relaxed: 1.7;
+
+  --ls-tight:   -0.01em;
+  --ls-normal:  0;
+  --ls-wide:    0.05em;
+  --ls-wider:   0.12em;
+  --ls-widest:  0.25em;
+
+  /* ─────────── 3) SPACE ─────────── */
+
+  --sp-0:   0;
+  --sp-1:   2px;
+  --sp-2:   4px;
+  --sp-3:   8px;
+  --sp-4:   12px;
+  --sp-5:   16px;
+  --sp-6:   20px;
+  --sp-7:   24px;
+  --sp-8:   32px;
+  --sp-10:  40px;
+  --sp-12:  48px;
+  --sp-16:  64px;
+  --sp-20:  80px;
+  --sp-24:  96px;
+
+  /* Viewport-aware (반응형 패딩) */
+  --sp-vw-sm:  clamp(8px, 1.4vw, 12px);
+  --sp-vw-md:  clamp(12px, 2.0vw, 20px);
+  --sp-vw-lg:  clamp(20px, 3.0vw, 32px);
+
+  /* ─────────── 4) RADIUS ─────────── */
+
+  --r-xs:   2px;
+  --r-sm:   4px;
+  --r-md:   8px;
+  --r-lg:   12px;
+  --r-xl:   16px;
+  --r-2xl:  24px;
+  --r-pill: 999px;
+  --r-full: 50%;
+
+  /* ─────────── 5) ELEVATION (shadow + tag glow) ─────────── */
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-2: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --shadow-3: 0 8px 24px rgba(0, 0, 0, 0.55);
+  --shadow-4: 0 16px 48px rgba(0, 0, 0, 0.7);
+
+  /* Tag glow — 발광 효과 (호버/액티브 상태) */
+  --glow-fire-sm:  0 0 12px rgba(255, 42, 109, 0.45);
+  --glow-fire-md:  0 0 28px rgba(255, 42, 109, 0.6);
+  --glow-fire-lg:  0 0 48px rgba(255, 42, 109, 0.85);
+
+  --glow-ice-sm:   0 0 12px rgba(5, 217, 232, 0.45);
+  --glow-ice-md:   0 0 28px rgba(5, 217, 232, 0.6);
+  --glow-ice-lg:   0 0 48px rgba(5, 217, 232, 0.85);
+
+  --glow-gold-sm:  0 0 12px rgba(255, 215, 0, 0.45);
+  --glow-gold-md:  0 0 28px rgba(255, 215, 0, 0.6);
+  --glow-gold-lg:  0 0 48px rgba(255, 215, 0, 0.85);
+
+  --glow-time-sm:  0 0 12px rgba(211, 0, 197, 0.45);
+  --glow-chaos-sm: 0 0 12px rgba(255, 111, 0, 0.45);
+  --glow-echo-sm:  0 0 12px rgba(179, 255, 0, 0.45);
+
+  --glow-legendary: 0 0 32px rgba(255, 170, 0, 0.55);
+
+  /* Inner highlight (반사광) */
+  --inset-highlight:  inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --inset-soft:       inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  /* ─────────── 6) MOTION ─────────── */
+
+  --dur-instant: 80ms;
+  --dur-fast:    150ms;
+  --dur-base:    250ms;
+  --dur-slow:    400ms;
+  --dur-slower:  600ms;
+  --dur-cinema:  900ms;
+
+  --ease-linear:    linear;
+  --ease-out:       cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:        cubic-bezier(0.5, 0, 0.75, 0);
+  --ease-in-out:    cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-bounce:    cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-snap:      cubic-bezier(0.5, 0, 0.1, 1);
+
+  /* ─────────── 7) Z-INDEX (layer order) ─────────── */
+
+  --z-canvas:   0;
+  --z-world-fx: 1;
+  --z-hud:      10;
+  --z-popup:    20;
+  --z-overlay:  30;
+  --z-modal:    40;
+  --z-toast:    50;
+  --z-boot:     999;
+
+  /* ─────────── 8) COMPONENT-LEVEL DERIVED ─────────── */
+
+  /* 안전영역 (iOS notch / Android gesture bar) */
+  --safe-top:    env(safe-area-inset-top, 0);
+  --safe-bottom: env(safe-area-inset-bottom, 0);
+  --safe-left:   env(safe-area-inset-left, 0);
+  --safe-right:  env(safe-area-inset-right, 0);
+}
+
+/* Tag color helper class — 색을 효과적으로 빠르게 매핑 */
+.t-fire   { color: var(--fire); }
+.t-ice    { color: var(--ice); }
+.t-gold   { color: var(--gold); }
+.t-time   { color: var(--time); }
+.t-chaos  { color: var(--chaos); }
+.t-echo   { color: var(--echo); }
+
+.bg-surface   { background: var(--surface); }
+.bg-bg        { background: var(--bg); }
+.bg-glass     { background: var(--glass); }
+.bg-overlay   { background: var(--overlay-medium); }
+
+/* 모션 환경 설정 (접근성) */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-instant: 0ms;
+    --dur-fast:    1ms;
+    --dur-base:    1ms;
+    --dur-slow:    1ms;
+    --dur-slower:  1ms;
+    --dur-cinema:  1ms;
+  }
+}
+
+/* ⭐ 색약 모드 — 빨강/시안 → 주황/노랑.
+ * body.samsara-colorblind 클래스가 토글되면 UI 전반의 fire/ice 색을 식별성 높은 팔레트로 치환.
+ * 데미지 숫자는 world.ts에서 별도 처리(shape suffix 포함). */
+body.samsara-colorblind {
+  --fire:      var(--cb-fire);
+  --ice:       var(--cb-ice);
+  --bad:       var(--cb-bad);
+  --info:      var(--cb-info);
+  --fire-dim:  rgba(255, 138, 42, 0.6);
+  --ice-dim:   rgba(255, 243, 82, 0.6);
+}
+
+/* 색약 모드 + prefers-contrast 시스템 신호 자동 감지 */
+@media (prefers-contrast: more) {
+  :root {
+    --fire:  var(--cb-fire);
+    --ice:   var(--cb-ice);
+  }
+}

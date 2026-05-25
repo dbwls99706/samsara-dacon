@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 자석 — U자 자석 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges" width="16" height="16">
+  <defs><style>.r{fill:#e11d48}.b{fill:#1a1a1a}.w{fill:#fafafa}.s{fill:#a0a0b0}</style></defs>
+  <!-- 좌측 다리 -->
+  <rect class="r" x="2" y="2" width="3" height="9"/>
+  <rect class="b" x="2" y="11" width="3" height="2"/>
+  <!-- 우측 다리 -->
+  <rect class="r" x="11" y="2" width="3" height="9"/>
+  <rect class="b" x="11" y="11" width="3" height="2"/>
+  <!-- 위 곡선 -->
+  <rect class="r" x="2" y="2" width="12" height="2"/>
+  <!-- N/S 표기 -->
+  <rect class="w" x="2" y="2" width="3" height="1"/>
+  <rect class="w" x="11" y="2" width="3" height="1"/>
+  <!-- 자기력선 -->
+  <rect class="s" x="6" y="6" width="1" height="1"/>
+  <rect class="s" x="9" y="6" width="1" height="1"/>
+  <rect class="s" x="7" y="9" width="1" height="1"/>
+  <rect class="s" x="8" y="9" width="1" height="1"/>
+</svg>

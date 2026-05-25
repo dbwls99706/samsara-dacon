@@ -1,0 +1,143 @@
+/* SAMSARA · 윤회 — Animation Library
+ *
+ * screens.ts 인라인 키프레임을 통합. 새 애니는 여기에만 추가한다.
+ * prefers-reduced-motion 시 tokens.css 의 --dur-* 가 1ms 로 떨어져 자동 무효화.
+ */
+
+/* ─────────── BRAND / TITLE ─────────── */
+@keyframes logo-pulse {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.35); }
+}
+@keyframes title-glow {
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(255, 42, 109, 0.6)); }
+  50%      { filter: drop-shadow(0 0 28px rgba(5, 217, 232, 0.8)); }
+}
+@keyframes title-letter {
+  0%   { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes panel-rise {
+  0%   { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ─────────── COMBO / FEEDBACK ─────────── */
+@keyframes combo-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+@keyframes badge-bounce {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.08); }
+}
+@keyframes float-up {
+  0%   { opacity: 0; transform: translateY(0) scale(0.6); }
+  20%  { opacity: 1; transform: translateY(-22px) scale(1.2); }
+  60%  { opacity: 1; transform: translateY(-50px) scale(1); }
+  100% { opacity: 0; transform: translateY(-90px) scale(0.8); }
+}
+@keyframes ripple {
+  0%   { transform: scale(0.5); opacity: 0.85; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+@keyframes hotspot {
+  0%, 100% { opacity: 0.6; transform: scale(1) rotate(0); }
+  50%      { opacity: 1; transform: scale(1.15) rotate(180deg); }
+}
+@keyframes tap-bounce {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50%      { transform: scale(0.93) translateY(6px); }
+}
+
+/* ─────────── RARITY / IDENTITY GLOW ─────────── */
+@keyframes legendary-shimmer {
+  0%, 100% { box-shadow: 0 0 30px rgba(255, 170, 0, 0.45); }
+  50%      { box-shadow: 0 0 50px rgba(255, 42, 109, 0.7); }
+}
+@keyframes identity-glow {
+  0%, 100% { box-shadow: 0 0 14px rgba(255, 215, 0, 0.3); }
+  50%      { box-shadow: 0 0 32px rgba(255, 42, 109, 0.55); }
+}
+@keyframes ritual-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+@keyframes card-shimmer {
+  0%   { transform: translateX(-150%); }
+  100% { transform: translateX(300%); }
+}
+@keyframes card-pulse-border {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05); }
+  50%      { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15); }
+}
+
+/* ─────────── ENVIRONMENT (배경 별/네뷸러) ─────────── */
+@keyframes stars {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.95; }
+}
+@keyframes nebula-drift {
+  0%   { transform: translate(0, 0); }
+  50%  { transform: translate(30px, -20px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes shooting-star {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: translate(-200px, 200px); opacity: 0; }
+}
+@keyframes scan-line {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+@keyframes orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes float {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-14px); }
+}
+@keyframes twinkle {
+  0%   { opacity: 0.2; }
+  100% { opacity: 0.9; }
+}
+@keyframes pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* ─────────── BOOT / TRANSITION ─────────── */
+@keyframes boot-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes fade-out {
+  to { opacity: 0; visibility: hidden; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes toast-rise {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ─────────── LOW HP / CRISIS (저체력 비네팅) ─────────── */
+@keyframes lowhp-breathe {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.85; }
+}
+
+/* ─────────── UTILITY ANIMATION CLASSES ─────────── */
+.anim-fade-in    { animation: fade-in var(--dur-base) var(--ease-out); }
+.anim-slide-up   { animation: slide-up var(--dur-slow) var(--ease-out); }
+.anim-panel-rise { animation: panel-rise var(--dur-slow) var(--ease-out); }
+.anim-pulse      { animation: pulse 2s var(--ease-in-out) infinite; }
+.anim-float      { animation: float 3s var(--ease-in-out) infinite alternate; }

@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#0a0a1a" />
+  <title>SAMSARA · 윤회 — Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="screens-toolbar" aria-label="화면 미리보기 전환">
+    <button data-target="main">메인</button>
+    <button data-target="game">게임</button>
+    <button data-target="card">카드 선택</button>
+    <button data-target="ritual">의식</button>
+    <button data-target="gameover">게임 오버</button>
+    <button data-target="shop">환생의 사원</button>
+    <button data-target="transcend">초월</button>
+  </div>
+
+  <main class="stage">
+    <!-- ───────── 메인 ───────── -->
+    <section class="screen" data-screen="main">
+      <div class="logo">
+        <div class="logo-eng">SAMSARA</div>
+        <div class="logo-kor">윤회 · 輪廻</div>
+      </div>
+      <div class="tagline">30초마다 새 운명을 짠다</div>
+      <div class="tagline-en">Every 30 seconds, a new fate.</div>
+
+      <div class="demo-window">
+        <div class="demo-label">자동 데모</div>
+        <div class="tiger-frame">
+          <div class="tiger">🐯</div>
+          <div class="float-num n1">+1</div>
+          <div class="float-num n2">+3</div>
+          <div class="float-num n3">+10</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-huge">▶ 시작 START</button>
+
+      <div class="meta-row">
+        <div class="meta-cell"><span class="meta-label">최고</span><span class="meta-value">1.4e9</span></div>
+        <div class="meta-cell"><span class="meta-label">어제</span><span class="meta-value">8.2e8</span></div>
+        <div class="meta-cell"><span class="meta-label">RP</span><span class="meta-value">412</span></div>
+        <div class="meta-cell"><span class="meta-label">사이클</span><span class="meta-value">142</span></div>
+      </div>
+
+      <nav class="bottom-nav">
+        <button class="ico">📖<span>도감</span></button>
+        <button class="ico">🛕<span>상점</span></button>
+        <button class="ico">⚙️<span>옵션</span></button>
+        <button class="ico">🌐<span>한/A</span></button>
+      </nav>
+    </section>
+
+    <!-- ───────── 게임 ───────── -->
+    <section class="screen" data-screen="game">
+      <header class="hud">
+        <div class="hud-left">
+          <div class="big-num">1.234B</div>
+          <div class="combo-tag combo-mid">⚡ COMBO ×17</div>
+        </div>
+        <div class="hud-right">
+          <div class="time">⏱ 14.2s</div>
+          <div class="lives">❤❤❤</div>
+          <div class="wave">W4</div>
+        </div>
+      </header>
+
+      <div class="identity-banner">
+        🔥🔥🔥💰💰 <strong>황금 화염</strong> · GOLDEN FLAME
+      </div>
+      <div class="modifier-banner">🎲 황금 비 — 5초마다 +500 폭우</div>
+
+      <div class="game-area">
+        <div class="hotspot" style="--x:75%; --y:30%">✨</div>
+        <div class="tiger big">🐯</div>
+        <div class="float-num game-n1">+500</div>
+        <div class="float-num game-n2">+1,500</div>
+        <div class="float-num game-n3">×10!</div>
+        <div class="ripple"></div>
+      </div>
+
+      <div class="card-slots">
+        <div class="card-mini" data-tag="fire">
+          <span class="tag">🔥</span>
+          <div class="cm-name">폭발</div>
+          <div class="cm-desc">10탭 +50</div>
+        </div>
+        <div class="card-mini" data-tag="fire">
+          <span class="tag">🔥</span>
+          <div class="cm-name">화염방사</div>
+          <div class="cm-desc">5탭 +30</div>
+        </div>
+        <div class="card-mini" data-tag="fire">
+          <span class="tag">🔥</span>
+          <div class="cm-name">봉화</div>
+          <div class="cm-desc">시작 +500</div>
+        </div>
+        <div class="card-mini" data-tag="gold">
+          <span class="tag">💰</span>
+          <div class="cm-name">황금손</div>
+          <div class="cm-desc">5% ×10</div>
+        </div>
+        <div class="card-mini" data-tag="gold">
+          <span class="tag">💰</span>
+          <div class="cm-name">잭팟</div>
+          <div class="cm-desc">1% ×100</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── 카드 선택 ───────── -->
+    <section class="screen" data-screen="card">
+      <div class="screen-title">W4 → W5</div>
+      <div class="screen-sub">이번 점수 <span class="hi">+1,234,567</span></div>
+      <div class="screen-prompt">카드 1장 선택</div>
+
+      <div class="card-row">
+        <article class="card-big" data-rarity="common" data-tag="fire">
+          <div class="card-tag">🔥</div>
+          <div class="card-rarity">COMMON</div>
+          <div class="card-name">폭발</div>
+          <div class="card-effect">10탭마다 +50</div>
+          <div class="card-flavor">"침묵 끝에 폭발이 온다."</div>
+        </article>
+        <article class="card-big" data-rarity="rare" data-tag="gold">
+          <div class="card-tag">💰</div>
+          <div class="card-rarity">RARE</div>
+          <div class="card-name">잭팟</div>
+          <div class="card-effect">1% 확률 탭 ×100</div>
+          <div class="card-flavor">"번개가 두 번 친다."</div>
+        </article>
+        <article class="card-big legendary" data-rarity="legendary" data-tag="echo">
+          <div class="card-tag">🪞</div>
+          <div class="card-rarity">LEGENDARY</div>
+          <div class="card-name">거울의 방</div>
+          <div class="card-effect">모든 카드 효과 +1회 발동</div>
+          <div class="card-flavor">"방 전체가 너를 본다."</div>
+        </article>
+      </div>
+
+      <button class="btn btn-ghost">건너뛰기 — 보너스 +500</button>
+    </section>
+
+    <!-- ───────── 의식 ───────── -->
+    <section class="screen" data-screen="ritual">
+      <div class="ritual-glow"></div>
+      <div class="screen-title gold">의식 RITUAL</div>
+      <div class="screen-sub">보스 격파 시간 18.4초 · 보너스 +50%</div>
+      <div class="screen-prompt">영구 런 버프 1개 선택</div>
+
+      <div class="card-row">
+        <article class="card-big" data-rarity="epic" data-tag="fire">
+          <div class="card-tag">🔥</div>
+          <div class="card-rarity">PERMANENT</div>
+          <div class="card-name">격노</div>
+          <div class="card-effect">보스 격파 시 +5,000</div>
+          <div class="card-flavor">"분노가 곧 힘이다."</div>
+        </article>
+        <article class="card-big" data-rarity="epic" data-tag="ice">
+          <div class="card-tag">❄️</div>
+          <div class="card-rarity">PERMANENT</div>
+          <div class="card-name">영원의 약속</div>
+          <div class="card-effect">라이프 영구 +1</div>
+          <div class="card-flavor">"끝나지 않을 약속."</div>
+        </article>
+        <article class="card-big" data-rarity="epic" data-tag="time">
+          <div class="card-tag">⏱️</div>
+          <div class="card-rarity">PERMANENT</div>
+          <div class="card-name">시간 정복</div>
+          <div class="card-effect">모든 보스 시간 -5초</div>
+          <div class="card-flavor">"시계는 너를 따른다."</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ───────── 게임 오버 ───────── -->
+    <section class="screen" data-screen="gameover">
+      <div class="screen-title death">💀 GAME OVER</div>
+      <div class="screen-sub">윤회의 끝</div>
+
+      <div class="final-score">1.42<span class="exp">e9</span></div>
+      <div class="badge new">🆕 신기록!</div>
+
+      <div class="identity-banner small">
+        🔥🔥🔥💰💰 <strong>황금 화염</strong>
+        <span class="meta-cell" style="margin-left:1rem">카드 7장 · 시너지 3종</span>
+      </div>
+
+      <div class="reel">
+        <div class="reel-title">하이라이트 릴 (5초)</div>
+        <div class="reel-frames">
+          <div class="frame">콤보 ×52</div>
+          <div class="frame">PHOENIX</div>
+          <div class="frame">보스 격파</div>
+          <div class="frame">SOLAR FORGE</div>
+          <div class="frame">+1B 폭발</div>
+        </div>
+      </div>
+
+      <div class="gameover-meta">
+        <div class="row"><span>RP</span><strong>+142 → 554</strong></div>
+        <div class="row"><span>업적</span><strong>"1B 첫 돌파" 해금</strong></div>
+        <div class="row hint">💡 신기록까지 9% 부족했습니다</div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-primary btn-huge">한 판 더</button>
+        <button class="btn btn-ghost">공유</button>
+        <button class="btn btn-ghost">상점</button>
+        <button class="btn btn-ghost">메인</button>
+      </div>
+    </section>
+
+    <!-- ───────── 환생의 사원 ───────── -->
+    <section class="screen" data-screen="shop">
+      <div class="screen-title">🛕 환생의 사원</div>
+      <div class="screen-sub">RP <strong class="hi">554</strong> · 누적 사이클 142</div>
+
+      <div class="shop-section">
+        <h3>🔓 잠금 해제</h3>
+        <div class="shop-grid">
+          <button class="shop-item">
+            <span class="si-icon">🃏</span>
+            <span class="si-name">카드 1장 잠금 해제</span>
+            <span class="si-progress">[12 / 30]</span>
+            <span class="si-cost">RP 5</span>
+          </button>
+          <button class="shop-item">
+            <span class="si-icon">🎲</span>
+            <span class="si-name">모디파이어 잠금 해제</span>
+            <span class="si-progress">[3 / 15]</span>
+            <span class="si-cost">RP 8</span>
+          </button>
+          <button class="shop-item">
+            <span class="si-icon">🦊</span>
+            <span class="si-name">캐릭터 스킨 — 까치</span>
+            <span class="si-progress">[1 / 5]</span>
+            <span class="si-cost">RP 30</span>
+          </button>
+          <button class="shop-item locked">
+            <span class="si-icon">🎵</span>
+            <span class="si-name">BGM 트랙 잠금 해제</span>
+            <span class="si-progress">[1 / 4]</span>
+            <span class="si-cost">RP 50</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="shop-section">
+        <h3>📈 영구 강화</h3>
+        <div class="shop-grid">
+          <button class="shop-item"><span class="si-icon">❤️</span><span class="si-name">시작 라이프 +1</span><span class="si-progress">[1 / 3]</span><span class="si-cost">RP 100</span></button>
+          <button class="shop-item"><span class="si-icon">🃏</span><span class="si-name">시작 카드 슬롯 +1</span><span class="si-progress">[0 / 1]</span><span class="si-cost">RP 200</span></button>
+          <button class="shop-item"><span class="si-icon">💰</span><span class="si-name">시작 코인 +500</span><span class="si-progress">[2 / 5]</span><span class="si-cost">RP 50</span></button>
+          <button class="shop-item"><span class="si-icon">📈</span><span class="si-name">RP 환산 효율 +10%</span><span class="si-progress">[0 / 3]</span><span class="si-cost">RP 75</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── 초월 ───────── -->
+    <section class="screen" data-screen="transcend">
+      <div class="transcend-stars"></div>
+      <div class="transcend-text">
+        <div class="t-title">TRANSCENDENCE</div>
+        <p>당신은 윤회의 굴레를 끊었습니다.</p>
+        <p>시작도 끝도 없는 곳에 도달했습니다.</p>
+        <p>이제 당신은 <strong>SAMSARA</strong> 너머에 있습니다.</p>
+      </div>
+      <div class="transcend-figure">🐯</div>
+      <button class="btn btn-ghost">메인으로</button>
+    </section>
+  </main>
+
+  <script>
+    // 단순 화면 전환
+    const buttons = document.querySelectorAll('.screens-toolbar button');
+    const screens = document.querySelectorAll('.screen');
+    function show(target) {
+      screens.forEach(s => s.classList.toggle('active', s.dataset.screen === target));
+      buttons.forEach(b => b.classList.toggle('on', b.dataset.target === target));
+    }
+    buttons.forEach(b => b.addEventListener('click', () => show(b.dataset.target)));
+    show('main');
+  </script>
+</body>
+</html>

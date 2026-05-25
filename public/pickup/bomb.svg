@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 폭탄 — 흑색 둥근 폭탄 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges" width="16" height="16">
+  <defs><style>.b{fill:#1a1a1a}.k{fill:#3a3a4a}.w{fill:#fafafa}.r{fill:#ff3366}.y{fill:#ffd700}.o{fill:#ff6f00}</style></defs>
+  <!-- 본체 -->
+  <rect class="b" x="3" y="6" width="10" height="2"/>
+  <rect class="b" x="2" y="8" width="12" height="5"/>
+  <rect class="b" x="3" y="13" width="10" height="1"/>
+  <rect class="k" x="3" y="6" width="10" height="1"/>
+  <rect class="k" x="2" y="8" width="2" height="3"/>
+  <!-- 도화선 -->
+  <rect class="b" x="7" y="3" width="2" height="3"/>
+  <rect class="o" x="7" y="2" width="2" height="1"/>
+  <rect class="y" x="7" y="1" width="2" height="1"/>
+  <rect class="r" x="6" y="2" width="1" height="1"/>
+  <rect class="r" x="9" y="2" width="1" height="1"/>
+  <!-- 광택 -->
+  <rect class="w" x="4" y="9" width="2" height="1"/>
+</svg>

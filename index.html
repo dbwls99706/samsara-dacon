@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0a1a" />
+    <meta name="description" content="SAMSARA · 윤회 — 30초마다 새 운명을 짠다. 60장 카드 · 18 시너지 · 28 운명(빌드) · 30 모디파이어 · 절차적 4 생태계가 매 윤회마다 다르게 엮이는 웹 서바이벌 로그라이트. 설치·가입 없이 브라우저에서 바로 플레이." />
+    <meta name="keywords" content="SAMSARA, 윤회, 서바이벌, 로그라이트, 카드, 게임, 한국, 도깨비, vampire survivors, web game, dacon, hackathon" />
+    <meta name="author" content="yujinhong3@gmail.com" />
+    <link rel="canonical" href="https://samsara-dacon.vercel.app/" />
+
+    <meta property="og:title" content="SAMSARA · 윤회" />
+    <meta property="og:description" content="30초마다 새 운명을 짠다 — 60카드·18시너지·28빌드·30모디파이어·절차적 4생태계로 매 판이 구조적으로 달라지는 웹 로그라이트. Every 30 seconds, a new fate." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://samsara-dacon.vercel.app/" />
+    <meta property="og:image" content="https://samsara-dacon.vercel.app/og-image.svg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:locale:alternate" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SAMSARA · 윤회" />
+    <meta name="twitter:description" content="30초마다 새 운명을 짠다. 60카드·18시너지·28빌드가 매 윤회마다 다르게 엮이는 웹 서바이벌 로그라이트." />
+    <meta name="twitter:image" content="https://samsara-dacon.vercel.app/og-image.svg" />
+
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="/character/tiger.svg" />
+    <link rel="apple-touch-icon" href="/character/tiger.svg" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <title>SAMSARA · 윤회 — 30초마다 새 운명을 짠다</title>
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+    <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/fonts-archive/Galmuri11/Galmuri11.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" /></noscript>
+    <!-- Galmuri11 — projectnoonnu 경로(404 사망)에서 fonts-archive 경로로 교체. -->
+    <!-- CORS: Cross-Origin-Resource-Policy: cross-origin 확인됨 (ORB 차단 해소). -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Galmuri11/Galmuri11.css" />
+
+    <style>
+      :root {
+        --bg: #0a0a1a;
+        --surface: #1a1a2e;
+        --text: #f0f0ff;
+        --text-dim: #8888aa;
+        --fire: #ff2a6d;
+        --ice: #05d9e8;
+        --gold: #ffd700;
+        --time: #d300c5;
+        --chaos: #ff6f00;
+        --echo: #b3ff00;
+        --rare: #4a90e2;
+        --epic: #b14aff;
+        --legendary: #ffaa00;
+        --ok: #00ff88;
+        --warn: #ffaa00;
+        --bad: #ff3366;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; padding: 0;
+        width: 100vw; width: 100dvw;
+        height: 100vh; height: 100dvh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Pretendard', system-ui, sans-serif;
+        overflow: hidden;
+        overscroll-behavior: none;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: none;
+        position: fixed;
+        inset: 0;
+        /* iOS notch / 안드로이드 gesture-bar 안전영역 */
+        padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+      }
+      /* HUD 위쪽 / 아래쪽이 노치를 침범하지 않도록 */
+      #hud-top { top: env(safe-area-inset-top, 0) !important; }
+      #hud-bottom { bottom: env(safe-area-inset-bottom, 0) !important; }
+      /* iOS 인풋 줌 방지 (16px 미만 시 zoom) */
+      input, button, select, textarea { font-size: 16px; }
+      /* 화면 중앙 폭죽/배너 텍스트 짤림 방지 */
+      #overlay {
+        max-width: 90vw !important;
+        font-size: clamp(20px, 5.5vw, 48px) !important;
+        word-break: keep-all;
+        line-height: 1.2;
+      }
+      #popups, #vignette, #lowhp { overflow: hidden; }
+      #app { position: fixed; inset: 0; }
+      #boot {
+        position: fixed; inset: 0;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        font-family: 'Galmuri11', monospace; text-align: center;
+      }
+      #boot h1 {
+        font-size: 48px; margin: 0 0 8px;
+        background: linear-gradient(90deg, var(--fire), var(--ice));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      #boot p { color: var(--text-dim); margin: 4px 0; }
+      noscript { color: var(--bad); padding: 24px; }
+      @media (hover: none) {
+        button:hover, [role="button"]:hover { transform: none !important; box-shadow: none !important; }
+      }
+      /* HUD 반응형 — 좁은 화면에서 미니맵/무기 사이드바 스케일 다운 + 충돌 회피 */
+      @media (max-width: 480px) {
+        #hud-minimap { width: 110px !important; height: 110px !important; top: 100px !important; right: 8px !important; }
+        #hud-weapons { top: 220px !important; right: 8px !important; transform: scale(0.78); transform-origin: top right; }
+        #hud-top, #hud-bottom { font-size: 10px !important; padding: 8px 12px !important; }
+      }
+      @media (max-width: 360px) {
+        #hud-minimap { display: none; }
+        #hud-weapons { top: 100px !important; }
+      }
+      /* ── Juice: 저체력 비네팅 — life === 1 시 호흡 펄스 (1.5s) ── */
+      @keyframes lowhp-breathe {
+        0%, 100% { opacity: 0.35; }
+        50%      { opacity: 0.85; }
+      }
+      #lowhp.active {
+        opacity: 1 !important;
+        animation: lowhp-breathe 1.5s ease-in-out infinite;
+      }
+      body.perf #lowhp.active {
+        animation: none;
+        opacity: 0.55 !important;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #lowhp.active { animation: none; opacity: 0.5 !important; }
+      }
+      /* ── Juice: 콤보 임계 플래시 (×25/50/100/200/500) ── */
+      #combo-flash {
+        position: absolute; inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        background: linear-gradient(135deg, #05d9e8, #ffd700);
+        mix-blend-mode: screen;
+        transition: opacity .08s ease-out;
+        z-index: 6;
+        will-change: opacity, background;
+      }
+      /* ── Juice: 카드 픽 줌 — worldCanvas GPU 합성 힌트 ── */
+      #world-canvas, canvas { will-change: transform; }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="boot" style="background: radial-gradient(ellipse at center, #1a0a26 0%, #0a0a1a 70%);">
+        <div style="position:relative;width:120px;height:120px;margin-bottom:16px">
+          <!-- 회전하는 음양 -->
+          <div id="boot-spinner" style="
+            width:120px;height:120px;border-radius:50%;
+            background:conic-gradient(from 0deg, #ff2a6d 0deg, #ff2a6d 180deg, #05d9e8 180deg, #05d9e8 360deg);
+            animation:boot-spin 2.4s linear infinite;
+            mask:radial-gradient(circle, transparent 35%, black 35%);
+            -webkit-mask:radial-gradient(circle, transparent 35%, black 35%);
+            box-shadow:0 0 32px rgba(255,42,109,0.4);
+          "></div>
+        </div>
+        <h1 style="margin:0 0 4px;letter-spacing:8px">SAMSARA</h1>
+        <p style="font-family:Galmuri11, monospace;font-size:13px;color:#888;letter-spacing:4px;margin:0">윤회 / 輪廻</p>
+        <p style="margin:8px 0 0;font-size:11px;color:#666;letter-spacing:2px">30초마다 새 운명을 짠다</p>
+        <!-- 진행 바 -->
+        <div style="margin-top:32px;width:240px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden">
+          <div id="boot-bar" style="
+            height:100%;width:0%;
+            background:linear-gradient(90deg,#ff2a6d,#05d9e8,#ffd700);
+            transition:width .3s ease-out;
+            box-shadow:0 0 12px #ff2a6d;
+          "></div>
+        </div>
+        <p id="boot-status" style="font-family:Galmuri11, monospace;font-size:10px;color:#555;margin-top:8px;letter-spacing:2px">초기화 중…</p>
+      </div>
+    </div>
+    <noscript style="display:block;color:#ff3366;padding:24px;text-align:center;font-family:Pretendard">이 게임은 JavaScript가 필요합니다.</noscript>
+    <style>
+      @keyframes boot-spin { to { transform: rotate(360deg); } }
+      @keyframes fade-out { to { opacity: 0; visibility: hidden; } }
+      #boot.hide { animation: fade-out .4s forwards; }
+    </style>
+    <script>
+      // 부트 진행률 업데이트 — main.ts 가 늦게 시작해도 진행 표시
+      (function() {
+        var bar = document.getElementById('boot-bar');
+        var status = document.getElementById('boot-status');
+        var stages = [
+          { p: 15, t: '한자 디코딩 중…' },
+          { p: 35, t: '카드 60장 로딩…' },
+          { p: 55, t: '시너지 18종 평가…' },
+          { p: 75, t: '오디오 합성 준비…' },
+          { p: 90, t: '월드 초기화…' },
+        ];
+        var i = 0;
+        function tick() {
+          if (i >= stages.length) return;
+          bar.style.width = stages[i].p + '%';
+          status.textContent = stages[i].t;
+          i++;
+          setTimeout(tick, 180 + Math.random() * 160);
+        }
+        tick();
+        window.addEventListener('samsara-ready', function() {
+          bar.style.width = '100%';
+          status.textContent = '준비 완료';
+          setTimeout(function() {
+            var b = document.getElementById('boot');
+            if (b) b.classList.add('hide');
+          }, 200);
+          setTimeout(function() {
+            var b = document.getElementById('boot');
+            if (b && b.parentNode) b.parentNode.removeChild(b);
+          }, 700);
+        });
+      })();
+    </script>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

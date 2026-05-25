@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SAMSARA · 까치 공격 (날개 펼침 + 부리 벌림 + 황금 눈) - 32×32 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="crispEdges" width="32" height="32">
+  <defs><style>
+    .b{fill:#1a1a1a}.w{fill:#fafafa}.bl{fill:#1e3a8a}.y{fill:#fbbf24}.r{fill:#e11d48}.e{fill:#ffd700}
+  </style></defs>
+  <!-- 머리 -->
+  <rect class="b" x="11" y="6" width="9" height="2"/>
+  <rect class="b" x="10" y="8" width="11" height="2"/>
+  <rect class="b" x="9" y="10" width="13" height="2"/>
+  <!-- 부리 벌림 -->
+  <rect class="y" x="20" y="10" width="5" height="1"/>
+  <rect class="y" x="20" y="13" width="5" height="1"/>
+  <rect class="r" x="22" y="11" width="3" height="2"/>
+  <!-- 눈 (황금) -->
+  <rect class="e" x="16" y="9" width="2" height="2"/>
+  <rect class="b" x="17" y="10" width="1" height="1"/>
+  <!-- 몸통 -->
+  <rect class="b" x="8" y="12" width="14" height="2"/>
+  <rect class="b" x="7" y="14" width="13" height="3"/>
+  <rect class="b" x="6" y="17" width="12" height="3"/>
+  <rect class="w" x="9" y="14" width="6" height="3"/>
+  <rect class="w" x="8" y="17" width="6" height="3"/>
+  <!-- 날개 (양쪽 펼침 — 위/아래) -->
+  <rect class="bl" x="13" y="11" width="9" height="2"/>
+  <rect class="bl" x="12" y="13" width="11" height="2"/>
+  <rect class="bl" x="13" y="18" width="9" height="2"/>
+  <rect class="bl" x="14" y="20" width="7" height="1"/>
+  <!-- 꼬리 -->
+  <rect class="b" x="2" y="16" width="5" height="2"/>
+  <rect class="b" x="2" y="18" width="6" height="1"/>
+  <rect class="bl" x="2" y="17" width="3" height="1"/>
+  <!-- 다리 (떠 있음, 발톱 세움) -->
+  <rect class="y" x="10" y="21" width="2" height="2"/>
+  <rect class="y" x="14" y="21" width="2" height="2"/>
+  <rect class="b" x="10" y="23" width="1" height="1"/>
+  <rect class="b" x="11" y="23" width="1" height="1"/>
+  <rect class="b" x="14" y="23" width="1" height="1"/>
+  <rect class="b" x="15" y="23" width="1" height="1"/>
+  <!-- 단청 빨강 점 -->
+  <rect class="r" x="11" y="14" width="1" height="1"/>
+</svg>

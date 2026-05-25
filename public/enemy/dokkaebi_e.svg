@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 외계 마귀 (도깨비) — 보라 사이버펑크 도깨비 + 안테나 + 회로 무늬 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" shape-rendering="crispEdges" width="28" height="28">
+  <defs><style>
+    .p{fill:#b14aff}.dp{fill:#5e1a98}.b{fill:#0a0510}.r{fill:#ff2a6d}.y{fill:#fde68a}.w{fill:#fafafa}.c{fill:#05d9e8}
+  </style></defs>
+  <!-- 안테나 (사이버) -->
+  <rect class="b" x="7" y="2" width="1" height="4"/>
+  <rect class="b" x="20" y="2" width="1" height="4"/>
+  <rect class="c" x="6" y="1" width="3" height="2"/>
+  <rect class="c" x="19" y="1" width="3" height="2"/>
+  <rect class="r" x="7" y="2" width="1" height="1"/>
+  <rect class="r" x="20" y="2" width="1" height="1"/>
+  <!-- 머리 -->
+  <rect class="p" x="8" y="6" width="12" height="2"/>
+  <rect class="p" x="6" y="8" width="16" height="3"/>
+  <rect class="p" x="5" y="11" width="18" height="4"/>
+  <rect class="p" x="6" y="15" width="16" height="2"/>
+  <rect class="p" x="8" y="17" width="12" height="2"/>
+  <rect class="dp" x="6" y="14" width="16" height="1"/>
+  <!-- 회로 무늬 -->
+  <rect class="c" x="5" y="11" width="3" height="1"/>
+  <rect class="c" x="20" y="11" width="3" height="1"/>
+  <rect class="c" x="14" y="8" width="1" height="3"/>
+  <!-- 사이버 눈 (빨강 광채) -->
+  <rect class="r" x="8" y="11" width="3" height="3"/>
+  <rect class="r" x="17" y="11" width="3" height="3"/>
+  <rect class="y" x="9" y="12" width="1" height="1"/>
+  <rect class="y" x="18" y="12" width="1" height="1"/>
+  <!-- 송곳니 -->
+  <rect class="w" x="10" y="15" width="1" height="2"/>
+  <rect class="w" x="17" y="15" width="1" height="2"/>
+  <rect class="w" x="13" y="16" width="2" height="1"/>
+  <!-- 몸통 + 회로 -->
+  <rect class="p" x="9" y="19" width="10" height="5"/>
+  <rect class="dp" x="9" y="22" width="10" height="2"/>
+  <rect class="c" x="13" y="20" width="2" height="1"/>
+  <rect class="c" x="11" y="22" width="6" height="1"/>
+  <!-- 팔 + 무기 손 -->
+  <rect class="p" x="5" y="20" width="3" height="3"/>
+  <rect class="p" x="20" y="20" width="3" height="3"/>
+  <rect class="r" x="4" y="21" width="2" height="2"/>
+  <rect class="r" x="22" y="21" width="2" height="2"/>
+  <!-- 다리 -->
+  <rect class="p" x="10" y="24" width="3" height="3"/>
+  <rect class="p" x="15" y="24" width="3" height="3"/>
+  <rect class="b" x="10" y="27" width="3" height="1"/>
+  <rect class="b" x="15" y="27" width="3" height="1"/>
+</svg>

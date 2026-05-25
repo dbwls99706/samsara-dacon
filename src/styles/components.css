@@ -1,0 +1,464 @@
+/* SAMSARA · 윤회 — Component Library
+ *
+ * tokens.css 위에서 동작. 모든 컴포넌트는 var(--...) 만 참조 — 하드코딩 색 금지.
+ * 화면(screens.ts)에서 인라인 cssText 대신 이 클래스를 우선 사용한다.
+ */
+
+/* ─────────── BUTTON ─────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-7);
+  font-family: var(--font-pixel);
+  font-size: var(--fp-14);
+  letter-spacing: var(--ls-wide);
+  color: var(--text);
+  background: var(--surface);
+  border: 1.5px solid var(--surface-2);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out);
+  will-change: transform;
+}
+.btn:hover {
+  border-color: var(--ice);
+  color: var(--ice);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2), var(--glow-ice-sm);
+}
+.btn:active { transform: translateY(0) scale(0.97); }
+.btn:focus-visible {
+  outline: 2px solid var(--ice);
+  outline-offset: 2px;
+}
+.btn[disabled],
+.btn.is-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  filter: saturate(0.5);
+}
+
+/* Primary — 결정적 액션 (Start / Confirm) */
+.btn-primary {
+  background: var(--grad-fire);
+  border-color: transparent;
+  color: var(--text-strong);
+  box-shadow: var(--glow-fire-md), var(--inset-highlight);
+}
+.btn-primary:hover {
+  border-color: transparent;
+  color: var(--text-strong);
+  box-shadow: var(--glow-fire-lg), var(--inset-highlight);
+}
+
+/* Ghost — 보조 액션 (Cancel / Settings) */
+.btn-ghost {
+  background: transparent;
+  border-color: var(--surface-2);
+  color: var(--text-dim);
+}
+.btn-ghost:hover {
+  border-color: var(--ice);
+  color: var(--ice);
+  background: var(--glass-thin);
+}
+
+/* Danger — 파괴적 (Reset / Delete) */
+.btn-danger {
+  background: transparent;
+  border-color: var(--bad);
+  color: var(--bad);
+}
+.btn-danger:hover {
+  background: var(--bad);
+  color: var(--bg);
+  box-shadow: 0 0 24px rgba(255, 51, 102, 0.6);
+}
+
+/* Sizes */
+.btn-sm { padding: var(--sp-3) var(--sp-5); font-size: var(--fp-12); }
+.btn-lg { padding: var(--sp-5) var(--sp-8); font-size: var(--fp-18); }
+.btn-huge {
+  width: 100%;
+  padding: var(--sp-6) var(--sp-10);
+  font-size: var(--fp-18);
+  letter-spacing: var(--ls-wider);
+}
+
+/* ─────────── PANEL / SURFACE ─────────── */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--surface-2);
+  border-radius: var(--r-lg);
+  padding: var(--sp-vw-md);
+}
+.panel-glass {
+  background: var(--overlay-medium);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass);
+  border-radius: var(--r-lg);
+  padding: var(--sp-vw-md);
+}
+.panel-elevated {
+  background: var(--surface);
+  border: 1px solid var(--surface-2);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-3);
+  padding: var(--sp-vw-md);
+}
+
+/* ─────────── HUD TILE ─────────── */
+.hud-tile {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--overlay-medium);
+  border: 1px solid var(--surface-2);
+  border-radius: var(--r-md);
+  font-family: var(--font-pixel);
+}
+.hud-tile .label {
+  font-size: var(--fp-8);
+  color: var(--text-dim);
+  letter-spacing: var(--ls-wider);
+  text-transform: uppercase;
+}
+.hud-tile .value {
+  font-size: var(--fp-18);
+  color: var(--ice);
+}
+.hud-tile.gold .value { color: var(--gold); text-shadow: var(--glow-gold-sm); }
+.hud-tile.fire .value { color: var(--fire); text-shadow: var(--glow-fire-sm); }
+
+/* ─────────── BADGE ─────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  font-family: var(--font-pixel);
+  font-size: var(--fp-10);
+  letter-spacing: var(--ls-wider);
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--text);
+}
+.badge-ok    { background: var(--ok);    color: var(--bg); }
+.badge-warn  { background: var(--warn);  color: var(--bg); }
+.badge-bad   { background: var(--bad);   color: var(--text-strong); }
+.badge-gold  { background: var(--gold);  color: var(--bg); box-shadow: var(--glow-gold-sm); }
+.badge-fire  { background: var(--fire);  color: var(--text-strong); }
+.badge-ice   { background: var(--ice);   color: var(--bg); }
+
+/* ─────────── COMBO TAG (×N 콤보 표시) ─────────── */
+.combo-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--sp-2) var(--sp-4);
+  font-family: var(--font-pixel);
+  font-size: var(--fp-12);
+  border-radius: var(--r-sm);
+  background: var(--fire);
+  color: var(--bg);
+  animation: combo-pulse 0.45s ease-out infinite;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+}
+.combo-tag.tier-mid    { background: var(--ice); }
+.combo-tag.tier-frenzy { background: var(--fire); box-shadow: var(--glow-fire-md); }
+.combo-tag.tier-god    { background: var(--gold); color: var(--bg); box-shadow: var(--glow-gold-md); }
+
+/* ─────────── IDENTITY BANNER (Run Identity 발현 시) ─────────── */
+.identity-banner {
+  background: linear-gradient(90deg, rgba(255, 42, 109, 0.18), rgba(255, 215, 0, 0.18));
+  border: 1px solid var(--gold);
+  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-5);
+  font-family: var(--font-pixel);
+  font-size: var(--fp-12);
+  color: var(--gold);
+  text-align: center;
+  letter-spacing: var(--ls-wider);
+  animation: identity-glow 4s var(--ease-in-out) infinite;
+}
+
+/* ─────────── MODIFIER BANNER ─────────── */
+.modifier-banner {
+  background: var(--bg);
+  border-left: 3px solid var(--time);
+  padding: var(--sp-3) var(--sp-5);
+  font-family: var(--font-mono);
+  font-size: var(--fp-12);
+  color: var(--text-dim);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+
+/* ─────────── CARD MINI (HUD 슬롯) ─────────── */
+.card-mini {
+  flex-shrink: 0;
+  width: 88px;
+  background: var(--bg);
+  border: 1px solid var(--surface-2);
+  border-radius: var(--r-md);
+  padding: var(--sp-3);
+  text-align: center;
+  position: relative;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.card-mini:hover { transform: translateY(-3px); }
+.card-mini[data-tag="fire"]  { border-color: var(--fire-dim); }
+.card-mini[data-tag="ice"]   { border-color: var(--ice-dim); }
+.card-mini[data-tag="gold"]  { border-color: var(--gold-dim); }
+.card-mini[data-tag="time"]  { border-color: var(--time-dim); }
+.card-mini[data-tag="chaos"] { border-color: var(--chaos-dim); }
+.card-mini[data-tag="echo"]  { border-color: var(--echo-dim); }
+.card-mini .tag {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  font-size: var(--fp-12);
+}
+.card-mini .name {
+  font-size: var(--fp-10);
+  font-weight: var(--fw-bold);
+  color: var(--text);
+  margin-top: var(--sp-3);
+  letter-spacing: var(--ls-tight);
+}
+.card-mini .desc {
+  font-size: var(--fp-8);
+  color: var(--text-dim);
+  margin-top: var(--sp-2);
+  line-height: var(--lh-snug);
+}
+
+/* ─────────── CARD BIG (선택 화면) ─────────── */
+.card-big {
+  position: relative;
+  background: var(--bg);
+  border: 2px solid var(--rarity-c);
+  border-radius: var(--r-lg);
+  padding: var(--sp-vw-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  text-align: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) var(--ease-out),
+              border-color var(--dur-base) var(--ease-out);
+}
+.card-big[data-rarity="rare"]      { border-color: var(--rare); }
+.card-big[data-rarity="epic"]      { border-color: var(--epic); box-shadow: 0 0 20px rgba(177, 74, 255, 0.25); }
+.card-big[data-rarity="legendary"] {
+  border-color: var(--legendary);
+  background: linear-gradient(135deg, rgba(255, 170, 0, 0.12), rgba(255, 42, 109, 0.10), rgba(5, 217, 232, 0.10));
+  box-shadow: var(--glow-legendary);
+  animation: legendary-shimmer 2.5s var(--ease-in-out) infinite;
+}
+.card-big:hover {
+  transform: translateY(-12px) scale(1.04);
+  box-shadow: var(--shadow-4);
+  border-color: var(--text-strong);
+}
+.card-big:focus-visible {
+  outline: 3px solid var(--ice);
+  outline-offset: 4px;
+}
+/* ⭐ 모바일/터치 피드백 — :hover 가 트리거 안 되는 환경에서 누름 즉시 시각 반응. */
+.card-big:active {
+  transform: translateY(-4px) scale(0.97);
+  transition: transform 80ms var(--ease-out);
+  filter: brightness(1.1);
+}
+
+/* ─────────── SCREEN TITLE ─────────── */
+.screen-title {
+  font-family: var(--font-pixel);
+  font-size: var(--fp-18);
+  text-align: center;
+  letter-spacing: var(--ls-widest);
+  color: var(--ice);
+  text-shadow: var(--glow-ice-sm);
+  margin: var(--sp-3) 0;
+}
+.screen-title.gold  { color: var(--gold); text-shadow: var(--glow-gold-sm); }
+.screen-title.fire  { color: var(--fire); text-shadow: var(--glow-fire-sm); }
+.screen-title.death { color: var(--fire); text-shadow: var(--glow-fire-md); font-size: var(--fp-24); }
+
+.screen-sub {
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--text-dim);
+}
+.screen-prompt {
+  text-align: center;
+  font-size: var(--fs-base);
+  color: var(--text);
+  font-weight: var(--fw-bold);
+  margin-top: var(--sp-3);
+}
+
+/* ─────────── SCAN LINE (시네마틱 오버레이) ─────────── */
+.scanline {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(5, 217, 232, 0.04) 50%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  animation: scan-line 8s linear infinite;
+}
+
+/* ─────────── DIVIDER ─────────── */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--surface-2), transparent);
+  border: 0;
+  margin: var(--sp-5) 0;
+}
+.divider.fire  { background: linear-gradient(90deg, transparent, var(--fire-dim), transparent); }
+.divider.ice   { background: linear-gradient(90deg, transparent, var(--ice-dim), transparent); }
+.divider.gold  { background: linear-gradient(90deg, transparent, var(--gold-dim), transparent); }
+
+/* ─────────── PROGRESS BAR ─────────── */
+.progress {
+  width: 100%;
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  position: relative;
+}
+.progress > .fill {
+  height: 100%;
+  background: var(--grad-brand);
+  border-radius: inherit;
+  box-shadow: var(--glow-fire-sm);
+  transition: width var(--dur-base) var(--ease-out);
+}
+.progress.thin { height: 3px; }
+.progress.thick { height: 10px; }
+
+/* ─────────── KBD (키 가이드) ─────────── */
+.kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  font-size: var(--fp-10);
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--surface-3);
+  border-bottom-width: 2px;
+  border-radius: var(--r-sm);
+  letter-spacing: var(--ls-normal);
+}
+
+/* ─────────── TOAST (업적/알림) ─────────── */
+.toast {
+  position: fixed;
+  bottom: calc(var(--sp-7) + var(--safe-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--overlay-hard);
+  border: 1px solid var(--gold);
+  border-radius: var(--r-md);
+  padding: var(--sp-4) var(--sp-7);
+  font-family: var(--font-pixel);
+  font-size: var(--fp-12);
+  color: var(--gold);
+  letter-spacing: var(--ls-wide);
+  z-index: var(--z-toast);
+  box-shadow: var(--shadow-3), var(--glow-gold-sm);
+  animation: toast-rise var(--dur-slow) var(--ease-out);
+}
+
+/* ─────────── A11Y / FOCUS ─────────── */
+:focus-visible {
+  outline: 2px solid var(--ice);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* ⭐ Touch feedback utility — 인라인 스타일 버튼이 :active 없이 만들어질 때 클래스 추가만으로 즉시 활성화.
+ * 모든 버튼/탭 가능 패널에 권장. iOS 회색 탭 하이라이트 차단도 함께 처리. */
+.tap-press {
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 90ms var(--ease-out), filter 90ms var(--ease-out);
+}
+.tap-press:active {
+  transform: scale(0.96);
+  filter: brightness(1.1);
+}
+
+/* ⭐ 모든 button 의 기본 iOS 회색 하이라이트 제거 (자체 :active 가 더 정확) */
+button { -webkit-tap-highlight-color: transparent; }
+
+/* ⭐ 최소 탭 타깃 보장 클래스 — iOS HIG 44×44, Material 48×48 */
+.tap-44 { min-height: 44px; min-width: 44px; }
+.tap-48 { min-height: 48px; min-width: 48px; }
+
+/* ⭐ 스크롤 cue — 긴 모달 화면 하단 페이드+화살표.
+ * 컨테이너에 .scroll-host 클래스 부착, 자식으로 <div class="scroll-cue"></div> 추가하면 자동 표시.
+ * JS 가 onscroll 에서 .at-bottom 토글 → cue 사라짐 처리. */
+.scroll-host { position: relative; }
+.scroll-cue {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: 0;
+  height: 64px;
+  pointer-events: none;
+  z-index: 9;
+  background: linear-gradient(180deg, transparent, rgba(2,1,10,0.85));
+  display: flex; align-items: flex-end; justify-content: center;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  opacity: 1;
+  transition: opacity 250ms var(--ease-out);
+}
+.scroll-cue::after {
+  content: "↓ 더보기";
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(5,217,232,0.85);
+  text-shadow: 0 0 8px rgba(5,217,232,0.4);
+  animation: scroll-cue-bounce 1.6s ease-in-out infinite;
+}
+@keyframes scroll-cue-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.scroll-host.at-bottom .scroll-cue { opacity: 0; }
+
+/* ─────────── BACKGROUND DECORATIONS ─────────── */
+.bg-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 60% 50%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 80% 20%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(2px 2px at 30% 70%, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 50% 85%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 90% 60%, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(1px 1px at 10% 50%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(2px 2px at 40% 15%, rgba(255, 255, 255, 0.55), transparent);
+  background-size: 100% 100%;
+  animation: stars 8s var(--ease-in-out) infinite;
+  opacity: 0.7;
+}

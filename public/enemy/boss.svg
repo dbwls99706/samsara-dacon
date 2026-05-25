@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 사령신 (Death Lord) — 거대한 우주 도깨비 왕 + 9 별 왕관 + 은하 망토 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" shape-rendering="crispEdges" width="100" height="100">
+  <defs><style>
+    .f{fill:#ff2a6d}.df{fill:#9c1c4a}.b{fill:#0a0510}.y{fill:#ffd700}.dy{fill:#b88a00}.w{fill:#fafafa}.r{fill:#e11d48}.p{fill:#b14aff}.dp{fill:#5e1a98}.c{fill:#05d9e8}
+  </style></defs>
+  <!-- 별 왕관 (9개 별) -->
+  <rect class="y" x="20" y="5" width="6" height="14"/>
+  <rect class="y" x="74" y="5" width="6" height="14"/>
+  <rect class="y" x="35" y="8" width="6" height="11"/>
+  <rect class="y" x="59" y="8" width="6" height="11"/>
+  <rect class="y" x="47" y="2" width="6" height="17"/>
+  <rect class="dy" x="20" y="14" width="6" height="3"/>
+  <rect class="dy" x="74" y="14" width="6" height="3"/>
+  <rect class="dy" x="35" y="14" width="6" height="3"/>
+  <rect class="dy" x="59" y="14" width="6" height="3"/>
+  <rect class="dy" x="47" y="14" width="6" height="3"/>
+  <!-- 별 광채 (시안 빛) -->
+  <rect class="c" x="22" y="3" width="2" height="2"/>
+  <rect class="c" x="76" y="3" width="2" height="2"/>
+  <rect class="c" x="49" y="0" width="2" height="2"/>
+  <rect class="w" x="37" y="5" width="2" height="2"/>
+  <rect class="w" x="61" y="5" width="2" height="2"/>
+  <!-- 머리 (붉은 사령) -->
+  <rect class="f" x="22" y="19" width="56" height="6"/>
+  <rect class="f" x="18" y="25" width="64" height="8"/>
+  <rect class="f" x="14" y="33" width="72" height="14"/>
+  <rect class="f" x="14" y="47" width="72" height="12"/>
+  <rect class="f" x="18" y="59" width="64" height="6"/>
+  <rect class="f" x="22" y="65" width="56" height="6"/>
+  <rect class="df" x="14" y="46" width="72" height="2"/>
+  <rect class="df" x="18" y="32" width="64" height="2"/>
+  <!-- 보랏빛 그림자 -->
+  <rect class="dp" x="14" y="33" width="6" height="32"/>
+  <rect class="dp" x="80" y="33" width="6" height="32"/>
+  <!-- 회로 무늬 (이마) -->
+  <rect class="c" x="40" y="28" width="4" height="2"/>
+  <rect class="c" x="56" y="28" width="4" height="2"/>
+  <rect class="c" x="48" y="26" width="4" height="6"/>
+  <!-- 거대 눈 (보라/시안) -->
+  <rect class="w" x="22" y="36" width="14" height="10"/>
+  <rect class="w" x="64" y="36" width="14" height="10"/>
+  <rect class="p" x="26" y="38" width="8" height="6"/>
+  <rect class="p" x="68" y="38" width="8" height="6"/>
+  <rect class="c" x="29" y="40" width="3" height="3"/>
+  <rect class="c" x="71" y="40" width="3" height="3"/>
+  <rect class="b" x="30" y="41" width="1" height="1"/>
+  <rect class="b" x="72" y="41" width="1" height="1"/>
+  <!-- 코 + 입 -->
+  <rect class="r" x="44" y="50" width="12" height="4"/>
+  <rect class="b" x="38" y="56" width="24" height="6"/>
+  <rect class="w" x="40" y="58" width="3" height="4"/>
+  <rect class="w" x="46" y="58" width="3" height="4"/>
+  <rect class="w" x="52" y="58" width="3" height="4"/>
+  <rect class="w" x="58" y="58" width="3" height="4"/>
+  <!-- 어깨 — 은하 망토 -->
+  <rect class="dp" x="22" y="71" width="56" height="4"/>
+  <rect class="f" x="28" y="71" width="44" height="10"/>
+  <rect class="df" x="28" y="78" width="44" height="3"/>
+  <rect class="f" x="24" y="81" width="52" height="14"/>
+  <rect class="dp" x="20" y="81" width="4" height="14"/>
+  <rect class="dp" x="76" y="81" width="4" height="14"/>
+  <rect class="df" x="24" y="92" width="52" height="3"/>
+  <!-- 은하수 점 -->
+  <rect class="w" x="26" y="84" width="1" height="1"/>
+  <rect class="c" x="30" y="86" width="1" height="1"/>
+  <rect class="w" x="34" y="83" width="1" height="1"/>
+  <rect class="y" x="68" y="85" width="1" height="1"/>
+  <rect class="w" x="72" y="87" width="1" height="1"/>
+  <!-- 황금 갑옷 -->
+  <rect class="y" x="32" y="84" width="36" height="2"/>
+  <rect class="y" x="44" y="86" width="12" height="6"/>
+  <rect class="dy" x="44" y="90" width="12" height="2"/>
+</svg>

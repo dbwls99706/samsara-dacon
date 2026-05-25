@@ -1,0 +1,29 @@
+{
+  "name": "samsara",
+  "version": "0.1.0",
+  "description": "SAMSARA · 윤회 — 30초마다 새 운명을 짠다. DACON 월간 해커톤 출품작.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 4173",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "node scripts/e2e-smoke.mjs",
+    "test:impression": "node scripts/e2e-impression.mjs",
+    "lint": "tsc --noEmit",
+    "proposal:pdf": "node scripts/build-proposal-pdf.mjs"
+  },
+  "devDependencies": {
+    "marked": "^18.0.3",
+    "playwright": "^1.49.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.4"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.46.1"
+  }
+}

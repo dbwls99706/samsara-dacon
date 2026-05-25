@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 사령 호랑이 (장산범) — 우주적 미니보스 / 별빛 줄무늬 + 보라 광휘 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" shape-rendering="crispEdges" width="44" height="44">
+  <defs><style>
+    .b{fill:#1a0a2e}.k{fill:#0a0510}.r{fill:#ff2a6d}.y{fill:#ffd700}.w{fill:#fafafa}.dr{fill:#a01030}.p{fill:#b14aff}.c{fill:#05d9e8}
+  </style></defs>
+  <!-- 외곽 보라 광휘 -->
+  <rect class="p" x="4" y="14" width="2" height="14"/>
+  <rect class="p" x="38" y="14" width="2" height="14"/>
+  <rect class="p" x="14" y="4" width="16" height="2"/>
+  <!-- 귀 -->
+  <rect class="k" x="8" y="6" width="4" height="3"/>
+  <rect class="k" x="32" y="6" width="4" height="3"/>
+  <rect class="k" x="9" y="9" width="3" height="2"/>
+  <rect class="k" x="32" y="9" width="3" height="2"/>
+  <!-- 머리 (보랏빛 검은 호랑이) -->
+  <rect class="b" x="10" y="10" width="24" height="3"/>
+  <rect class="b" x="8" y="13" width="28" height="3"/>
+  <rect class="b" x="6" y="16" width="32" height="5"/>
+  <rect class="b" x="6" y="21" width="32" height="4"/>
+  <rect class="b" x="8" y="25" width="28" height="3"/>
+  <rect class="b" x="10" y="28" width="24" height="2"/>
+  <!-- 별빛 줄무늬 (시안) -->
+  <rect class="c" x="13" y="14" width="2" height="3"/>
+  <rect class="c" x="20" y="14" width="2" height="3"/>
+  <rect class="c" x="27" y="14" width="2" height="3"/>
+  <rect class="dr" x="6" y="20" width="3" height="2"/>
+  <rect class="dr" x="35" y="20" width="3" height="2"/>
+  <!-- 별 박힌 이마 -->
+  <rect class="w" x="21" y="11" width="2" height="2"/>
+  <rect class="y" x="21" y="11" width="1" height="1"/>
+  <!-- 큰 눈 (보랏빛) -->
+  <rect class="p" x="11" y="17" width="6" height="4"/>
+  <rect class="p" x="27" y="17" width="6" height="4"/>
+  <rect class="y" x="13" y="18" width="2" height="2"/>
+  <rect class="y" x="29" y="18" width="2" height="2"/>
+  <rect class="k" x="14" y="19" width="1" height="1"/>
+  <rect class="k" x="30" y="19" width="1" height="1"/>
+  <!-- 코 + 입 -->
+  <rect class="r" x="20" y="22" width="4" height="2"/>
+  <rect class="k" x="18" y="24" width="8" height="2"/>
+  <!-- 큰 송곳니 (별빛) -->
+  <rect class="w" x="16" y="26" width="2" height="3"/>
+  <rect class="w" x="26" y="26" width="2" height="3"/>
+  <rect class="c" x="16" y="26" width="1" height="1"/>
+  <rect class="c" x="27" y="26" width="1" height="1"/>
+  <!-- 몸통 -->
+  <rect class="b" x="14" y="30" width="16" height="6"/>
+  <rect class="b" x="12" y="34" width="20" height="4"/>
+  <rect class="c" x="14" y="33" width="16" height="1"/>
+  <!-- 발 + 우주 빛 -->
+  <rect class="b" x="13" y="38" width="5" height="4"/>
+  <rect class="b" x="26" y="38" width="5" height="4"/>
+  <rect class="p" x="13" y="40" width="2" height="2"/>
+  <rect class="p" x="29" y="40" width="2" height="2"/>
+</svg>

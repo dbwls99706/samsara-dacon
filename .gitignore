@@ -1,0 +1,41 @@
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Build artifacts
+.vite
+coverage
+*.tsbuildinfo
+
+# Temporary
+*.tmp
+~$*
+.tmp-pdf/
+
+# Claude Code 워크스페이스 (개인 설정 + 49 agents + 73 skills 통합본)
+.claude/
+.claude_history
+
+# 임시 dump 파일
+balance-result*.txt
+
+# E2E / Judge session 캡처 (재생성 가능)
+scripts/judge-out/
+scripts/e2e-out/
