@@ -111,6 +111,7 @@ playRoot.innerHTML = `
     /* FPS 표시: 기본 hidden, body.samsara-show-fps 일 때만 노출 */
     body.samsara-show-fps #hud-fps-frame { display: block !important; }
     @keyframes hud-fadein { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes input-hint-pulse { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
   </style>
   <div id="hud-top" style="position:absolute;top:env(safe-area-inset-top,0);left:0;right:0;padding:16px 20px;display:flex;justify-content:space-between;align-items:flex-start;font-family:Galmuri11,monospace;text-shadow:0 0 8px rgba(0,0,0,0.9);pointer-events:none;gap:14px;">
     <div class="hud-frame" style="border-color:rgba(255,215,0,0.3);padding:10px 18px">
@@ -201,6 +202,9 @@ playRoot.innerHTML = `
     <div style="position:absolute;bottom:32px;color:var(--text-dim);font-size:10px;letter-spacing:3px;opacity:0.6">ESC 또는 ▶ 재개 클릭</div>
   </div>
 
+  <!-- ⭐ 입력 hint — 첫 사이클(meta.totalCycles === 0) W1 에서만 6초간 표시. 첫 의미있는 입력 시 즉시 페이드아웃.
+       정체성 P4 "읽지 않아도 알 수 있다" 가드 — 4 axis audit 에서 W1 13초 사망 위험 식별됨. -->
+  <div id="hud-input-hint" style="position:absolute;bottom:130px;left:50%;transform:translateX(-50%) translateY(8px);font-family:Galmuri11,monospace;font-size:12px;letter-spacing:2.5px;color:#fff;background:linear-gradient(135deg,rgba(255,42,109,0.18),rgba(5,217,232,0.22));border:1px solid rgba(5,217,232,0.55);border-radius:18px;padding:9px 22px;pointer-events:none;opacity:0;transition:opacity .45s ease-out,transform .45s ease-out;white-space:nowrap;text-shadow:0 0 8px rgba(0,0,0,0.9);z-index:9;box-shadow:0 4px 16px rgba(0,0,0,0.4),0 0 14px rgba(5,217,232,0.22);backdrop-filter:blur(6px);display:none;font-weight:bold;"></div>
   <div id="overlay" style="position:absolute;top:30%;left:50%;transform:translateX(-50%);font-family:Galmuri11,monospace;color:var(--gold);font-size:44px;opacity:0;pointer-events:none;transition:opacity .3s;text-shadow:0 0 15px var(--gold),0 0 30px var(--gold),0 4px 0 rgba(0,0,0,0.6);text-align:center;letter-spacing:3px;font-weight:bold;"></div>
   <div id="popups" style="position:absolute;inset:0;pointer-events:none;"></div>
   <div id="vignette" style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center, transparent 35%, rgba(255,42,109,0.7) 100%);opacity:0;transition:opacity .15s;"></div>
@@ -296,6 +300,38 @@ let _lastStartTime = 0;
 // 그 호출 경로의 모듈-스코프 let 은 반드시 subscribeState 호출 이전에 선언되어야 한다.
 // renderWeaponHud 의 dirty-check 캐시. 자세한 의도는 함수 정의부 주석 참조.
 let _lastWeaponSig = '';
+// ⭐ 입력 hint 상태 — 첫 사이클 W1 에서만 표시. 첫 의미있는 readInput().active==true 시 hide.
+//   6초 안전 timeout — 그 안에 입력이 없어도 자동 페이드아웃 (HUD 영구 노이즈 방지).
+let _inputHintActive = false;
+let _inputHintTimer: ReturnType<typeof setTimeout> | null = null;
+function hideInputHint(): void {
+  if (!_inputHintActive) return;
+  _inputHintActive = false;
+  if (_inputHintTimer !== null) { clearTimeout(_inputHintTimer); _inputHintTimer = null; }
+  const el = document.getElementById('hud-input-hint');
+  if (!el) return;
+  el.style.opacity = '0';
+  el.style.transform = 'translateX(-50%) translateY(8px)';
+  setTimeout(() => { if (!_inputHintActive && el) el.style.display = 'none'; }, 500);
+}
+function showInputHintForNewPlayer(): void {
+  const el = document.getElementById('hud-input-hint');
+  if (!el) return;
+  // 터치 우선 환경 감지 — coarse pointer (모바일/터치 패널). 데스크톱은 fine.
+  const isTouch = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
+  el.textContent = isTouch ? '👆 화면 어디든 드래그하여 이동' : '⌨ W A S D · ← ↑ ↓ → 로 이동';
+  el.style.display = 'block';
+  el.style.animation = 'input-hint-pulse 2.2s ease-in-out infinite';
+  _inputHintActive = true;
+  // 다음 프레임에 opacity 트랜지션 발동
+  requestAnimationFrame(() => {
+    if (!_inputHintActive) return;
+    el.style.opacity = '1';
+    el.style.transform = 'translateX(-50%) translateY(0)';
+  });
+  if (_inputHintTimer !== null) clearTimeout(_inputHintTimer);
+  _inputHintTimer = setTimeout(() => hideInputHint(), 6000);
+}
 function startNewWave(wave: number) {
   const now = performance.now();
   if (wave === _lastStartedWave && now - _lastStartTime < 1500) {
@@ -334,6 +370,11 @@ function startNewWave(wave: number) {
     // 분석 — 런 시작
     const ma = engine.getState().meta as any;
     track({ type: 'run_start', data: { character: ma.character ?? 'tiger', cycle: ma.totalCycles ?? 0, rp: ma.rp ?? 0 } });
+    // ⭐ 입력 hint — 첫 사이클(totalCycles === 0) W1 시작 시에만 표시.
+    //   readInput() 가 처음 active 되면 hideInputHint() 호출, 6초 timeout 폴백.
+    if ((ma.totalCycles ?? 0) === 0) {
+      showInputHintForNewPlayer();
+    }
   }
   // 보스 웨이브 — 1.5초 침묵 cue 후 spawn ("정적이 가장 강한 cue")
   if (isBossWave(wave)) {
@@ -409,6 +450,10 @@ engine.subscribeState((s) => {
   // 플레이어 HP 동기화
   world.player.hp = s.life;
   world.player.hpMax = s.lifeMax;
+  // ⭐ 입력 hint — play/boss 페이즈 외(pause, gameOver, cardPick 등) 즉시 hide.
+  if (_inputHintActive && s.phase !== 'playing' && s.phase !== 'boss') {
+    hideInputHint();
+  }
   if (s.hideScore) {
     $score.textContent = '???';
     $runScore.textContent = '???';
@@ -1674,6 +1719,8 @@ function gameLoopBody(t: number) {
   // 월드 시뮬은 play / boss 페이즈에서만
   if (s.phase === 'playing' || s.phase === 'boss') {
     const input = readInput();
+    // ⭐ 입력 hint hide — 첫 의미있는 이동(키 또는 드래그) 즉시 페이드아웃.
+    if (_inputHintActive && input.active) hideInputHint();
     // 슬로우모션 (피격 200ms)
     const slowMo = world.slowMoUntil > t ? 0.35 : 1;
     const dash = consumeDash();
