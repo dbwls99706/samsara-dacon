@@ -33,13 +33,18 @@ describe('START_WAVE — 웨이브 진입', () => {
   it('웨이브 시간이 곡선에 따라 설정', () => {
     const s0 = freshState();
     const { state: s1 } = reduce(s0, { type: 'START_WAVE', wave: 1 });
-    expect(s1.waveTimeMax).toBe(30);
-    expect(s1.waveTimeRemaining).toBe(30);
+    // W1/2 모디파이어 풀은 blessing 전용. mod_extra_time(+5) 만이 waveTime 에 영향 (단일 +5).
+    // 따라서 W1 baseline 30, 가능한 modifier extension 최대 +5 → 30~35 범위.
+    expect(s1.waveTimeMax).toBeGreaterThanOrEqual(30);
+    expect(s1.waveTimeMax).toBeLessThanOrEqual(35);
+    expect(s1.waveTimeRemaining).toBe(s1.waveTimeMax);
     expect(s1.wave).toBe(1);
 
     const { state: s2 } = reduce(s1, { type: 'END_WAVE' });
     const { state: s3 } = reduce(s2, { type: 'START_WAVE', wave: 2 });
-    expect(s3.waveTimeMax).toBe(45);
+    // W2 도 blessing 풀. baseline 45, 가능 extension +5 → 45~50.
+    expect(s3.waveTimeMax).toBeGreaterThanOrEqual(45);
+    expect(s3.waveTimeMax).toBeLessThanOrEqual(50);
   });
 
   it('멱등성: 같은 웨이브로 즉시 재진입은 무시', () => {

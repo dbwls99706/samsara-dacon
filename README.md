@@ -5,9 +5,11 @@
 > DACON 월간 해커톤 출품작 — "10분 안에 중독시켜라" 웹 미니게임 챌린지
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![tests](https://img.shields.io/badge/vitest-192%20passing-brightgreen.svg)](#품질-지표-직접-검증-가능)
-[![bundle](https://img.shields.io/badge/core%20gzip-111KB-blue.svg)](#산출물-요약-검증-가능)
+[![tests](https://img.shields.io/badge/vitest-196%20passing-brightgreen.svg)](#산출물-요약-검증-가능)
+[![bundle](https://img.shields.io/badge/core%20gzip-113KB-blue.svg)](#산출물-요약-검증-가능)
+[![lighthouse](https://img.shields.io/badge/FCP-259ms-brightgreen.svg)](#산출물-요약-검증-가능)
 [![assets](https://img.shields.io/badge/external%20assets-0%20byte-success.svg)](#라이선스--자산-출처)
+[![CI](https://img.shields.io/badge/CI-build%20·%20test%20·%20e2e-blue.svg)](.github/workflows/ci.yml)
 
 ---
 
@@ -30,7 +32,7 @@
 
 | 평가 항목 | 배점 | 어디서 확인 | 검증 방법 |
 |---|---|---|---|
-| **완성도** | 25 | 192 vitest + 빌드 워닝 0 + 60fps 유지 | `npm test` → 192 passed |
+| **완성도** | 25 | 196 vitest + 빌드 워닝 0 + 60fps 유지 + CI green | `npm test` → 196 passed / 15 files |
 | **참신성** | 20 | 30초 카드픽 + 28 Run Identity 변신 + 윤회 메타 | `src/data/cards.json` |
 | **사용성** | 20 | 첫 입력 < 3초, 첫 보상 < 30초, 색약/모션감쇄 지원 | `src/ui/screens.ts` mountTutorial |
 | **일관성** | 20 | docs/ 28종 기획문서 ↔ 코드 1:1, 데이터 주도 설계 | `src/game/cards.ts` (58 op) |
@@ -92,13 +94,17 @@ input.ts ─► state.ts ──EngineEvent──► main.ts ──► render/wor
 
 | 지표 | 수치 | 검증 |
 |---|---|---|
-| 코어 번들 (gzip) | **111 KB** — 외부 자산 0 byte | `npm run build` → `dist/assets/index-*.js` |
+| 코어 번들 (gzip) | **113 KB** — 외부 자산 0 byte | `npm run build` → `dist/assets/index-*.js` |
 | Supabase 청크 | 52 KB gzip — **lazy**, 리더보드 진입 시만 | 코드 분할, 초기 로드 미포함 |
-| 단위/통합 테스트 | **192 passed / 14 files** | `npm test` |
-| 회귀 가드 | i18n 동기 / 점수 폭주 / 보스 FSM / 지형 결정론 | `tests/` |
+| 단위/통합 테스트 | **196 passed / 15 files** | `npm test` |
+| E2E smoke (모바일 UA) | http 200 / load < 1.1s / 콘솔 errors+warnings 0 | `npm run test:e2e` |
+| 심사자 첫 인상 봇 (32s 입력 sim) | 콘솔 errors 0 / W1 진입 / canvas 등장 < 5s | `npm run test:impression` |
+| Lighthouse-lite (mobile) | FCP **259ms** / CLS **0** / a11y clean / long-task ≤ 1 | `npm run test:lh` |
+| 회귀 가드 | i18n 동기 / 점수 폭주 / 보스 FSM / 지형 결정론 / 모디파이어 이중적용 | `tests/` |
 | TypeScript | **strict** 모드, 빌드 워닝 0 | `npm run build` |
 | 헤드리스 밸런스 | `scripts/balance-sim.ts` 자동 플레이어 RI별 점수 측정 | `npx tsx scripts/balance-sim.ts` |
-| 외부 의존성 | Vite, Vitest, Supabase JS (RLS만, 키 노출 OK) | `package.json` |
+| 외부 의존성 | Vite, Vitest, Playwright (dev), Supabase JS (RLS만, 키 노출 OK) | `package.json` |
+| CI/CD | GitHub Actions: build · test · e2e · impression 4 게이트 | `.github/workflows/ci.yml` |
 
 ### 백엔드 (Supabase, 키 노출형 RLS)
 
@@ -171,11 +177,16 @@ create policy "lb_insert" on leaderboard for insert with check (
 
 ```bash
 npm install
-npm test         # vitest — 192 passed / 14 files
-npm run build    # tsc(strict) + vite build → dist/, 워닝 0
-npm run dev      # http://localhost:5173
-npm run preview  # 빌드 결과 미리보기
-npx tsx scripts/balance-sim.ts   # 헤드리스 밸런스 시뮬레이션
+npm test                  # vitest — 196 passed / 15 files
+npm run build             # tsc(strict) + vite build → dist/, 워닝 0
+npm run dev               # http://localhost:5173
+npm run preview           # 빌드 결과 미리보기 — http://localhost:4173
+npm run test:e2e          # Playwright smoke — 콘솔 errors/warnings 0 게이트
+npm run test:impression   # 심사자 첫 32초 인상 봇
+npm run test:lh           # Lighthouse-lite — FCP/LCP/CLS/번들/a11y
+npm run test:all          # build + test + e2e + impression + lh (CI 동등)
+npm run demo:record       # 시연 영상 헤드리스 폴백 녹화 (75초 webm + 컷 메타)
+npx tsx scripts/balance-sim.ts  # 헤드리스 밸런스 시뮬레이션
 ```
 
 ### 디렉터리
@@ -192,8 +203,9 @@ src/
 ├── ui/        # router · screens (12 화면)
 └── main.ts    # 부트스트랩 + EngineEvent 구독 + juice
 docs/          # 기획·전략 문서 28종
-scripts/       # balance-sim · md-to-pdf
-tests/         # vitest 14 파일 / 192 spec
+scripts/       # balance-sim · build-proposal-pdf · e2e-smoke · e2e-impression · lighthouse-lite · demo-record · judge-session · check-sfx-orphans
+tests/         # vitest 15 파일 / 196 spec
+.github/       # workflows/ci.yml (build · test · e2e · impression)
 ```
 
 ### 핵심 파일 빠른 참조
@@ -259,10 +271,10 @@ create policy "lb_insert" on leaderboard for insert with check (
 
 ## 마감 / 일정
 
-- ⏳ 2026-05-26 10:00 — 기획서 PDF 제출
+- ✅ 2026-05-26 10:00 — 기획서 PDF 제출 완료 (`docs/06_proposal_outline.pdf` 28p / 1.29 MB)
 - ⏳ 2026-06-08 10:00 — 최종 산출물 (배포 URL + GitHub + YouTube)
-- 2026-06-08 ~ 06-12 — 1차 대중 투표
-- 2026-06-12 ~ 06-19 — 2차 내부 평가
+- 2026-06-08 ~ 06-12 — 1차 대중 투표 (제출팀 60% / 참가팀 20% / 대중 20%)
+- 2026-06-12 ~ 06-19 — 2차 내부 정성 평가 (최종 순위 결정)
 
 ---
 

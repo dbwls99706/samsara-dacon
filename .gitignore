@@ -36,6 +36,8 @@ coverage
 # 임시 dump 파일
 balance-result*.txt
 
-# E2E / Judge session 캡처 (재생성 가능)
+# E2E / Judge session / Lighthouse / Demo recording 캡처 (재생성 가능)
 scripts/judge-out/
 scripts/e2e-out/
+scripts/lh-out/
+scripts/demo-out/

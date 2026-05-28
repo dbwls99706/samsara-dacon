@@ -13,6 +13,9 @@
     "test:watch": "vitest",
     "test:e2e": "node scripts/e2e-smoke.mjs",
     "test:impression": "node scripts/e2e-impression.mjs",
+    "test:lh": "node scripts/lighthouse-lite.mjs",
+    "test:all": "npm run build && npm test && npm run test:e2e && npm run test:impression && npm run test:lh",
+    "demo:record": "node scripts/demo-record.mjs",
     "lint": "tsc --noEmit",
     "proposal:pdf": "node scripts/build-proposal-pdf.mjs"
   },

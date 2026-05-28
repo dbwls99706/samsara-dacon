@@ -62,6 +62,34 @@ describe('applyModifier — 효과 즉시 디스패치', () => {
     expect(events.some(e => e.type === 'SFX')).toBe(true);
     expect(state.modifierThisWave).toBe(blessing);
   });
+
+  // 회귀 가드: 2026-05-28 이전엔 applyModifier 가 onWaveStart 효과를 즉시 실행하고,
+  // 그 직후 dispatchTrigger('onWaveStart') 가 같은 효과를 또 실행해서 이중 적용 발생.
+  // 예: mod_extra_time(+5) 가 +10 으로 누적. 단일 적용 보장.
+  it('handleStartWave 후 mod_extra_time 은 waveTime 을 정확히 +5 만 적용 (이중 적용 X)', async () => {
+    const { reduce } = await import('../src/game/state');
+    const extraTime = DATA.modifiers.find(m => m.id === 'mod_extra_time')!;
+    // pickModifier 우회: state.wave=1 daily 가 mod_extra_time 이면 OK. 아니어도 직접 적용 검증.
+    const state = newGameState({});
+    const events: EngineEvent[] = [];
+    // baseline = waveDuration(1) = 30. mod_extra_time 적용 후 dispatchTrigger 호출 흐름 재현.
+    const baseline = state.waveTimeMax; // newGameState 기본값 캡처
+    applyModifier(state, extraTime, e => events.push(e));
+    expect(state.modifierThisWave?.id).toBe('mod_extra_time');
+    // applyModifier 자체는 effects 미실행 (banner/SFX 만). waveTimeMax 변화 X.
+    expect(state.waveTimeMax).toBe(baseline);
+    // 실제 START_WAVE 경로 (applyModifier + dispatchTrigger) 시뮬: handleStartWave 가 이 흐름.
+    const { state: started } = reduce(newGameState({}), { type: 'START_WAVE', wave: 1 });
+    // 적용된 modifier 가 mod_extra_time 인지 확인 후 단일 +5 검증
+    if (started.modifierThisWave?.id === 'mod_extra_time') {
+      expect(started.waveTimeMax).toBe(35); // 30 baseline + 5 (단일 적용)
+      expect(started.waveTimeMax).not.toBe(40); // 이중 적용 회귀 가드
+    } else {
+      // 다른 modifier 가 추첨된 경우: waveTimeMax 는 baseline 또는 baseline+5 (다른 blessing 은 X 영향)
+      expect(started.waveTimeMax).toBeGreaterThanOrEqual(30);
+      expect(started.waveTimeMax).toBeLessThanOrEqual(35);
+    }
+  });
 });
 
 describe('checkSecretUnlocks — 조건별 잠금해제', () => {

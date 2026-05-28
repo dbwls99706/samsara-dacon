@@ -115,7 +115,11 @@ export function getDailyChallengeDefs(date: Date = new Date()): ModifierDef[] {
     .filter((m): m is ModifierDef => !!m);
 }
 
-/** 모디파이어 효과 즉시 적용 — 트리거 onWaveStart 효과만 즉시 발동. 그 외는 보유 상태로만. */
+/** 모디파이어 활성화 — 배너/SFX 만 즉시. 효과 적용은 호출 직후 dispatchTrigger('onWaveStart') 가 단일 경로로 담당. */
+// (이전엔 여기서도 onWaveStart 효과를 즉시 발동해 dispatchTrigger 와 이중 적용되었음 →
+//  mod_extra_time(+5) 가 +10 으로 누적되는 결함. handleStartWave 직후 dispatchTrigger 가 호출되므로
+//  여기서 효과 적용은 불필요. cards.ts dispatchTrigger 의 (e.trigger ?? 'onWaveStart') 필터가
+//  무-트리거 효과까지 onWaveStart 로 흡수.)
 export function applyModifier(state: GameState, mod: ModifierDef, emit: (e: EngineEvent) => void): void {
   state.modifierThisWave = mod;
   emit({ type: 'TEXT_BANNER', text: mod.name_ko, durationMs: 1500 });
@@ -125,18 +129,4 @@ export function applyModifier(state: GameState, mod: ModifierDef, emit: (e: Engi
       : mod.type === 'challenge' ? 'sfx_modifier_challenge'
       : 'sfx_modifier_secret',
   });
-
-  // onWaveStart 트리거가 명시된 효과는 즉시. 트리거가 없거나 그 외는 즉시 1회 적용.
-  for (const eff of mod.effects) {
-    if (eff.trigger && eff.trigger !== 'onWaveStart') continue;
-    const handler = OPS[eff.op];
-    if (!handler) continue;
-    const ctx: TriggerContext = {
-      trigger: 'onWaveStart',
-      state,
-      emit,
-      dispatch: () => {},
-    };
-    try { handler(eff, ctx); } catch (err) { console.error('[modifier]', mod.id, eff.op, err); }
-  }
 }
