@@ -199,6 +199,10 @@ playRoot.innerHTML = `
       <button id="pause-home" data-pb style="background:rgba(26,20,46,0.7);color:var(--text);border:1px solid rgba(255,255,255,0.18);padding:14px;border-radius:8px;font-family:Galmuri11,monospace;font-size:13px;letter-spacing:3px;cursor:pointer;backdrop-filter:blur(8px);transition:background .15s,border-color .15s,transform .15s">⌂  메인으로</button>
     </div>
 
+    <!-- ⭐ 무기 상세 — 플레이 중 HUD 는 아이콘 레일(액션 가림 X)이고, 전체 스탯/플레이버/
+         시너지 힌트는 여기서 확인. showPauseMenu() 가 일시정지 시 채운다. -->
+    <div id="pause-weapons" style="position:relative;margin-top:28px;width:min(560px,86vw);display:flex;flex-wrap:wrap;gap:8px;justify-content:center;animation:pause-rise .35s ease-out .18s both;max-height:34vh;overflow-y:auto"></div>
+
     <div style="position:absolute;bottom:32px;color:var(--text-dim);font-size:10px;letter-spacing:3px;opacity:0.6">ESC 또는 ▶ 재개 클릭</div>
   </div>
 
@@ -246,6 +250,7 @@ const $level = document.getElementById('hud-level')!;
 const $minimap = document.getElementById('hud-minimap') as HTMLCanvasElement;
 const $weaponsHud = document.getElementById('hud-weapons')!;
 const $pauseMenu = document.getElementById('pause-menu')!;
+const $pauseWeapons = document.getElementById('pause-weapons')!;
 // 일시정지 버튼 호버 효과
 for (const b of document.querySelectorAll<HTMLButtonElement>('#pause-menu [data-pb]')) {
   const isMain = b.id === 'pause-resume';
@@ -2052,35 +2057,24 @@ function renderWeaponHud() {
 
   if (sig !== _lastWeaponSig) {
     _lastWeaponSig = sig;
+    // ⭐ 아이콘 레일 — 플레이 중 HUD 는 아이콘+쿨다운 링+Lv 배지만. 이름/플레이버/스탯/시너지
+    //   힌트는 액션을 가리지 않게 제거(상세는 카드픽·일시정지 화면). 화면 우측 ~45% → 아이콘 폭.
     const items = world.weapons.map((w, idx) => {
       const evolved = w.evolved;
       const emoji = w.id.startsWith('starter_') ? '⚔️' : (TAG_EMOJI[w.tag] ?? '✨');
       const ringColor = evolved ? '#ffd700' : (TAG_COLOR[w.tag] ?? '#05d9e8');
-      const bg = evolved
-        ? 'linear-gradient(135deg,rgba(255,215,0,0.2),rgba(255,42,109,0.1),rgba(10,10,26,0.78))'
-        : 'linear-gradient(135deg,rgba(10,10,26,0.82),rgba(20,12,46,0.7))';
       const border = evolved ? '#ffd700' : 'rgba(255,255,255,0.18)';
-      const shadow = evolved ? '0 0 14px rgba(255,215,0,0.4)' : '0 4px 10px rgba(0,0,0,0.4)';
+      const shadow = evolved ? '0 0 14px rgba(255,215,0,0.45)' : '0 3px 8px rgba(0,0,0,0.4)';
       const name = (w as any).displayName ?? (w.id.startsWith('starter_') ? 'STARTER' : w.tag.toUpperCase());
-      const desc = (w as any).desc as string | undefined;
-      const dmgHint = (w as any).damageHint as string | undefined;
-      const evoHint = (w as any).evolutionHint as string | undefined;
+      // title = 데스크톱 hover 시 이름/레벨 확인 (시각 클러터 0, 접근성 보조)
       return `
-        <div data-wpn-idx="${idx}" style="display:flex;flex-direction:column;gap:6px;background:${bg};border:1px solid ${border};padding:8px 12px;border-radius:8px;width:200px;backdrop-filter:blur(8px);box-shadow:${shadow};">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div data-cd-wrap="${idx}" data-ring="${ringColor}" style="position:relative;width:38px;height:38px;flex-shrink:0;border-radius:50%;">
-              <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);border-radius:50%;border:1px solid rgba(255,255,255,0.1);"></div>
-              <div data-cd-fill="${idx}" style="position:absolute;inset:0;background:conic-gradient(${ringColor} 0%,transparent 0);border-radius:50%;mask:radial-gradient(circle, transparent 58%, black 60%);-webkit-mask:radial-gradient(circle, transparent 58%, black 60%);filter:drop-shadow(0 0 4px ${ringColor}88);"></div>
-              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;">${emoji}</div>
-            </div>
-            <div style="flex:1;min-width:0;">
-              <div style="font-size:13px;color:${evolved ? '#ffd700' : ringColor};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:1px;font-weight:bold;text-shadow:0 0 4px ${ringColor}88">${name}${evolved ? ' ★' : ''}</div>
-              <div style="font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;">Lv.${w.level} · ${w.cooldownMax.toFixed(1)}s 쿨</div>
-            </div>
+        <div data-wpn-idx="${idx}" title="${name} · Lv.${w.level} · ${w.cooldownMax.toFixed(1)}s" style="position:relative;width:46px;height:46px;border-radius:50%;background:rgba(10,10,26,0.6);border:1px solid ${border};box-shadow:${shadow};backdrop-filter:blur(6px);">
+          <div data-cd-wrap="${idx}" data-ring="${ringColor}" style="position:absolute;inset:3px;border-radius:50%;">
+            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);border-radius:50%;border:1px solid rgba(255,255,255,0.1);"></div>
+            <div data-cd-fill="${idx}" style="position:absolute;inset:0;background:conic-gradient(${ringColor} 0%,transparent 0);border-radius:50%;mask:radial-gradient(circle, transparent 56%, black 58%);-webkit-mask:radial-gradient(circle, transparent 56%, black 58%);filter:drop-shadow(0 0 4px ${ringColor}88);"></div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:19px;">${emoji}</div>
           </div>
-          ${desc ? `<div style="font-size:11px;color:rgba(255,255,255,0.85);line-height:1.4;letter-spacing:0.3px">${desc}</div>` : ''}
-          ${dmgHint ? `<div style="font-size:10px;color:${ringColor}cc;line-height:1.3;letter-spacing:0.5px;font-family:Galmuri11,monospace">${dmgHint}</div>` : ''}
-          ${evoHint ? `<div style="font-size:10px;color:rgba(255,255,255,0.55);line-height:1.3;letter-spacing:0.3px;border-top:1px dashed rgba(255,255,255,0.1);padding-top:4px;margin-top:2px">${evoHint}</div>` : ''}
+          <div style="position:absolute;bottom:-3px;right:-3px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:${evolved ? '#ffd700' : '#0a0a1a'};border:1px solid ${ringColor};color:${evolved ? '#0a0a1a' : ringColor};font-size:9px;font-weight:bold;line-height:13px;text-align:center;font-family:Galmuri11,monospace;">${evolved ? '★' : w.level}</div>
         </div>
       `;
     }).join('');
@@ -2103,6 +2097,49 @@ function renderWeaponHud() {
       wrapEl.style.boxShadow = ready ? `0 0 10px ${ringColor},inset 0 0 4px ${ringColor}55` : 'none';
     }
   }
+}
+
+// ⭐ 일시정지 무기 상세 — 플레이 중 HUD 에서 뺀 이름/플레이버/스탯/시너지 힌트를 여기서 전부 노출.
+//   (1차 60% 동료 개발자가 빌드 깊이를 살피는 자리 + P4 "읽지 않아도" 와 충돌 없는 적절한 읽기 타이밍)
+function renderPauseWeapons() {
+  const TAG_EMOJI: Record<string, string> = { fire: '🔥', ice: '❄️', gold: '💰', time: '⏱️', chaos: '🌀', echo: '🪞' };
+  const TAG_COLOR: Record<string, string> = { fire: '#ff2a6d', ice: '#05d9e8', gold: '#ffd700', time: '#d300c5', chaos: '#ff6f00', echo: '#b3ff00' };
+  const items = world.weapons.map((w) => {
+    const evolved = w.evolved;
+    const emoji = w.id.startsWith('starter_') ? '⚔️' : (TAG_EMOJI[w.tag] ?? '✨');
+    const ringColor = evolved ? '#ffd700' : (TAG_COLOR[w.tag] ?? '#05d9e8');
+    const bg = evolved
+      ? 'linear-gradient(135deg,rgba(255,215,0,0.2),rgba(255,42,109,0.1),rgba(10,10,26,0.78))'
+      : 'linear-gradient(135deg,rgba(10,10,26,0.82),rgba(20,12,46,0.7))';
+    const border = evolved ? '#ffd700' : 'rgba(255,255,255,0.18)';
+    const name = (w as any).displayName ?? (w.id.startsWith('starter_') ? 'STARTER' : w.tag.toUpperCase());
+    const desc = (w as any).desc as string | undefined;
+    const dmgHint = (w as any).damageHint as string | undefined;
+    const evoHint = (w as any).evolutionHint as string | undefined;
+    return `
+      <div style="display:flex;flex-direction:column;gap:6px;background:${bg};border:1px solid ${border};padding:8px 12px;border-radius:8px;width:200px;box-shadow:0 4px 10px rgba(0,0,0,0.4);">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:34px;height:34px;flex-shrink:0;border-radius:50%;background:rgba(0,0,0,0.5);border:1px solid ${ringColor}66;display:flex;align-items:center;justify-content:center;font-size:17px;">${emoji}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;color:${evolved ? '#ffd700' : ringColor};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:1px;font-weight:bold;text-shadow:0 0 4px ${ringColor}88">${name}${evolved ? ' ★' : ''}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;">Lv.${w.level} · ${w.cooldownMax.toFixed(1)}s 쿨</div>
+          </div>
+        </div>
+        ${desc ? `<div style="font-size:11px;color:rgba(255,255,255,0.85);line-height:1.4;letter-spacing:0.3px">${desc}</div>` : ''}
+        ${dmgHint ? `<div style="font-size:10px;color:${ringColor}cc;line-height:1.3;letter-spacing:0.5px;font-family:Galmuri11,monospace">${dmgHint}</div>` : ''}
+        ${evoHint ? `<div style="font-size:10px;color:rgba(255,255,255,0.55);line-height:1.3;letter-spacing:0.3px;border-top:1px dashed rgba(255,255,255,0.1);padding-top:4px;margin-top:2px">${evoHint}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+  $pauseWeapons.innerHTML = world.weapons.length
+    ? `<div style="width:100%;text-align:center;font-size:10px;color:var(--text-dim);letter-spacing:3px;margin-bottom:2px">— 보유 무기 ${world.weapons.length} —</div>${items}`
+    : '';
+}
+
+// 일시정지 메뉴 표시 — 무기 상세를 먼저 채운 뒤 노출 (단일 진입점).
+function showPauseMenu() {
+  renderPauseWeapons();
+  $pauseMenu.style.display = 'flex';
 }
 
 function drawMinimap() {
@@ -2276,7 +2313,7 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden && (engine.getState().phase === 'playing' || engine.getState().phase === 'boss')) {
     engine.dispatch({ type: 'PAUSE' });
     saveRunSnapshot();
-    if (getScreen() === 'play') $pauseMenu.style.display = 'flex';
+    if (getScreen() === 'play') showPauseMenu();
   }
 });
 
@@ -2297,7 +2334,7 @@ window.addEventListener('beforeunload', () => {
 // 알트탭으로 다시 돌아왔을 때 pause-menu 가 클릭 받을 수 있도록 보장
 window.addEventListener('focus', () => {
   if (engine.getState().phase === 'paused' && getScreen() === 'play') {
-    $pauseMenu.style.display = 'flex';
+    showPauseMenu();
     $pauseMenu.style.pointerEvents = 'auto';
     // 혹시 모를 stale transform/animation 잔여 정리
     const resumeBtn = document.getElementById('pause-resume') as HTMLButtonElement | null;
@@ -2314,7 +2351,7 @@ window.addEventListener('keydown', (e) => {
       $pauseMenu.style.display = 'none';
     } else if (engine.getState().phase === 'playing' || engine.getState().phase === 'boss') {
       engine.dispatch({ type: 'PAUSE' });
-      $pauseMenu.style.display = 'flex';
+      showPauseMenu();
     }
   } else if (getScreen() !== 'home') {
     go('home');
