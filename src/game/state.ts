@@ -615,6 +615,9 @@ function handleGameOver(state: GameState, emit: (e: EngineEvent) => void) {
   const cycleAfter = state.meta.totalCycles + 1;
   const FIRST_RUN_BONUS_RP: Record<number, number> = { 1: 20, 2: 30, 3: 50, 4: 75, 5: 100 };
   const bonusRp = FIRST_RUN_BONUS_RP[cycleAfter] ?? 0;
+  // ⭐ 게임오버 화면 표시용 — 실제 메타에 누적되는 총 RP(점수분 + 첫5런 보너스)와 동일하게.
+  //   이게 없으면 화면은 점수분(floor(score/1e4))만 보여 첫 사망마다 "+0 RP" 로 보이는 버그.
+  state.stats.rpEarnedThisRun = Math.floor(rpEarned) + bonusRp;
 
   // ⭐ 깊이 가시화 — 평생 발견 집합 누적 (RI 28종 / 시너지 18종).
   // 게임오버 화면이 "N / 28 발견" 으로 시스템 폭을 노출. 카드는 누적만 되므로

@@ -2760,7 +2760,9 @@ export function mountHighlight(host: HTMLElement, engine: Engine): () => void {
   const meta = state.meta;
   const elapsed = state.stats.startedAt > 0 ? (performance.now() - state.stats.startedAt) / 1000 : state.elapsed;
   const dps = elapsed > 0 ? Math.round(state.totalScore / elapsed) : 0;
-  const rpGained = Math.max(0, Math.floor(state.totalScore / 10000));
+  // 실제 메타에 누적된 RP(점수분 + 첫5런 보너스)를 그대로 표시 — handleGameOver 가 set.
+  // (점수분만 표시하면 첫 5런 동안 보너스 +20~100 을 받고도 "+0 RP" 로 보이는 버그)
+  const rpGained = Math.max(0, state.stats.rpEarnedThisRun ?? Math.floor(state.totalScore / 10000));
   const isPB = state.totalScore > meta.bestScore;
 
   // 키프레임 한 번만

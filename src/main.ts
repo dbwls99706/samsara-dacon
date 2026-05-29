@@ -1638,8 +1638,10 @@ function countdown(wave: number) {
 
 function showAchievementToast(title: string, desc: string) {
   const toast = document.createElement('div');
+  // ⚠ 하단 우측 슬라이드인 — 상단(top:80px)에 두면 게임오버 "사 망" 도장(상단 중앙)과
+  //   플레이 중 미니맵(우상단)을 가렸다. 하단 앵커로 영웅 컷/HUD 상단을 항상 비운다.
   toast.style.cssText = `
-    position:fixed;top:80px;right:16px;z-index:30;
+    position:fixed;bottom:120px;right:16px;z-index:30;max-width:78vw;
     background:linear-gradient(135deg,#1a1a2e,#0a0a1a);
     border:2px solid var(--gold);border-radius:8px;padding:12px 16px;
     font-family:Galmuri11,monospace;color:var(--text);

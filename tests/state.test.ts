@@ -131,3 +131,41 @@ describe('PLAYER_HIT — 라이프 손실 + 콤보 끊김', () => {
     expect(s2.negateFirstLifeLoss).toBe(false);
   });
 });
+
+describe('GAME_OVER — RP 환산 표시 단일 진실원', () => {
+  // 회귀 가드: 게임오버 화면이 표시하는 RP(stats.rpEarnedThisRun)는 메타에 실제 누적되는
+  //   총 RP(점수분 + 첫 5런 보장 보너스)와 동일해야 한다. 이전엔 화면이 점수분만 계산해
+  //   첫 5런 동안 보너스(+20~100)를 받고도 "+0 RP" 로 보이는 버그가 있었다.
+  it('첫 런 저점수 사망: 표시 RP = 점수분(0) + 첫런 보너스(20) = 20', () => {
+    const s0 = freshState();
+    s0.totalScore = 2300; // floor(2300/10000) = 0 점수분
+    s0.coins = 0;
+    expect(s0.meta.totalCycles).toBe(0); // 첫 런
+    const before = s0.meta.rp;
+    const { state: s1 } = reduce(s0, { type: 'GAME_OVER' });
+    expect(s1.stats.rpEarnedThisRun).toBe(20);        // 화면 표시값
+    expect(s1.meta.rp).toBe(before + 20);             // 메타 실제 누적
+    expect(s1.stats.rpEarnedThisRun).toBe(s1.meta.rp - before); // 표시 == 실제
+  });
+
+  it('첫 런 고점수 사망: 표시 RP = 점수분(3) + 보너스(20) = 23', () => {
+    const s0 = freshState();
+    s0.totalScore = 30000; // floor(30000/10000) = 3
+    s0.coins = 0;
+    const before = s0.meta.rp;
+    const { state: s1 } = reduce(s0, { type: 'GAME_OVER' });
+    expect(s1.stats.rpEarnedThisRun).toBe(23);
+    expect(s1.meta.rp).toBe(before + 23);
+  });
+
+  it('6런차(보너스 소진) 사망: 표시 RP = 점수분만', () => {
+    const s0 = freshState();
+    s0.meta.totalCycles = 5; // 다음 런 = 6회차 → 보너스 0
+    s0.totalScore = 50000;   // floor = 5
+    s0.coins = 0;
+    const before = s0.meta.rp;
+    const { state: s1 } = reduce(s0, { type: 'GAME_OVER' });
+    expect(s1.stats.rpEarnedThisRun).toBe(5);
+    expect(s1.meta.rp).toBe(before + 5);
+  });
+});

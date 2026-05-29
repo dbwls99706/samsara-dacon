@@ -244,6 +244,9 @@ export interface RunStats {
   newSynergyThisRun?: number;   // 이번 런 최초 경험한 시너지 개수
   newModifierThisRun?: number;  // 이번 런 최초 경험한 모디파이어 개수
   newBiomeThisRun?: number;     // 이번 런 최초 밟은 biome 개수
+  // ⭐ 이번 런 실제 획득 RP (점수 환산 + 첫 5런 보장 보너스 포함). 게임오버 화면이
+  //   이 값을 그대로 표시 — 표시 숫자와 메타 실제 누적이 어긋나지 않게 단일 진실원.
+  rpEarnedThisRun?: number;
   // ⭐ 이번 런에서 경험한 모디파이어/biome id (run-scoped 누적). handleGameOver 가
   //   meta.seenModifierIds / seenBiomeIds 로 머지. 시뮬→reducer 는 Action 경유(불변식 유지).
   modifierIds?: string[];       // 이번 런에서 발동된 모디파이어 id (중복 제거)
