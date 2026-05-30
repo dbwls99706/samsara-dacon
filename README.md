@@ -5,8 +5,8 @@
 > DACON 월간 해커톤 출품작 — "10분 안에 중독시켜라" 웹 미니게임 챌린지
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![tests](https://img.shields.io/badge/vitest-196%20passing-brightgreen.svg)](#산출물-요약-검증-가능)
-[![bundle](https://img.shields.io/badge/core%20gzip-113KB-blue.svg)](#산출물-요약-검증-가능)
+[![tests](https://img.shields.io/badge/vitest-207%20passing-brightgreen.svg)](#산출물-요약-검증-가능)
+[![bundle](https://img.shields.io/badge/core%20gzip-115KB-blue.svg)](#산출물-요약-검증-가능)
 [![lighthouse](https://img.shields.io/badge/FCP-259ms-brightgreen.svg)](#산출물-요약-검증-가능)
 [![assets](https://img.shields.io/badge/external%20assets-0%20byte-success.svg)](#라이선스--자산-출처)
 [![CI](https://img.shields.io/badge/CI-build%20·%20test%20·%20e2e-blue.svg)](.github/workflows/ci.yml)
@@ -32,8 +32,8 @@
 
 | 평가 항목 | 배점 | 어디서 확인 | 검증 방법 |
 |---|---|---|---|
-| **완성도** | 25 | 196 vitest + 빌드 워닝 0 + 60fps 유지 + CI green | `npm test` → 196 passed / 15 files |
-| **참신성** | 20 | 30초 카드픽 + 28 Run Identity 변신 + 윤회 메타 | `src/data/cards.json` |
+| **완성도** | 25 | 207 vitest + 빌드 워닝 0 + 60fps 유지 + CI green | `npm test` → 207 passed / 15 files |
+| **참신성** | 20 | **윤회(輪廻): 죽으면 이전 생의 카드가 다음 생으로 계승** + 30초 카드픽 + 28 Run Identity 변신 | `src/data/cards.json` |
 | **사용성** | 20 | 첫 입력 < 3초, 첫 보상 < 30초, 색약/모션감쇄 지원 | `src/ui/screens.ts` mountTutorial |
 | **일관성** | 20 | docs/ 28종 기획문서 ↔ 코드 1:1, 데이터 주도 설계 | `src/game/cards.ts` (58 op) |
 | **재미** | 15 | 콤보 ×3~×500 8단계, 시너지 ULTIMATE, 일일 시드 리더보드 | `src/game/state.ts`, `src/game/boss.ts` |
