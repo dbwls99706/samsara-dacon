@@ -861,7 +861,9 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
     `;
     stats.appendChild(card);
   }
-  main.appendChild(stats);
+  // FTUE: 첫 방문(아직 1런도 안 함)엔 0/0/0 stat 카드가 "넌 아무것도 못 했다" 인상 → 숨김.
+  // 한 번이라도 사이클을 돈 뒤부터 노출 (research: "don't show zeroes").
+  if (meta.totalCycles > 0) main.appendChild(stats);
 
   // ⭐ 신규 플레이어 환영 메시지 — totalCycles 0 일 때 0/0/0 stat 카드만으론 동기부여 약함
   // 세계관 톤 (윤회 + 한국 신화) 으로 첫 인상 격려.
@@ -929,8 +931,9 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
   }
 
   // ⭐ 윤회 도감 진행 — 평생 발견 운명/시너지 비율 (게임오버 패널과 동일 룩).
-  // 메인에서 "아직 못 본 빌드가 N개" → 재플레이 동기 + 시스템 깊이를 첫 화면에서 노출.
-  {
+  // FTUE: 첫 방문엔 0/28·0% 막대 4개가 "벽 같은 0 더미" → 숨김. 단일 RP 잠금 티저(위)가
+  // 깊이 암시 역할을 대신. 1런 뒤 (totalCycles>0) 부터 수집 진척을 노출 → 점진적 공개.
+  if (meta.totalCycles > 0) {
     const codexPanel = discoveryCodexPanel(meta, {
       containerAnim: 'position:relative;z-index:2;width:min(420px,88vw);margin:0 0 12px;animation:panel-rise .8s ease-out .685s both;',
       showExtended: true, modifierTotal: allModifierDefs().length, biomeTotal: BIOME_KINDS.length,
@@ -939,8 +942,9 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
   }
 
   // ⭐ 일일 시련 — 매일 자정 모든 플레이어 동일 3 모디파이어 (W1/2/3 강제). research P0
+  // FTUE: 첫 방문엔 숨김(점진적 공개). 1런 뒤부터 노출 — 그때 "오늘의 경쟁" 이 의미를 가짐.
   const dailyMods = getDailyChallengeDefs();
-  if (dailyMods.length > 0) {
+  if (dailyMods.length > 0 && meta.totalCycles > 0) {
     const TYPE_COLOR: Record<string, string> = { blessing: '#00ff88', challenge: '#ff6f00', secret: '#b14aff' };
     const TYPE_LABEL: Record<string, string> = { blessing: '축복', challenge: '시련', secret: '비밀' };
     const dailyPanel = el('div', `

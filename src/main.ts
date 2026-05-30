@@ -113,24 +113,29 @@ playRoot.innerHTML = `
     @keyframes hud-fadein { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes input-hint-pulse { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
   </style>
-  <div id="hud-top" style="position:absolute;top:env(safe-area-inset-top,0);left:0;right:0;padding:16px 20px;display:flex;justify-content:space-between;align-items:flex-start;font-family:Galmuri11,monospace;text-shadow:0 0 8px rgba(0,0,0,0.9);pointer-events:none;gap:14px;">
-    <div class="hud-frame" style="border-color:rgba(255,215,0,0.3);padding:10px 18px">
-      <div class="hud-label" style="color:rgba(255,215,0,0.85);font-size:12px;letter-spacing:3px">사이클 점수</div>
-      <div id="hud-score" style="font-size:38px;color:var(--gold);font-weight:bold;animation:hud-pulse-gold 3s ease-in-out infinite;letter-spacing:1px;line-height:1.1">0</div>
-      <div id="hud-runscore-wrap" style="display:flex;align-items:baseline;gap:6px;margin-top:2px">
-        <span style="font-size:8px;color:rgba(255,215,0,0.55);letter-spacing:2px;font-weight:bold">누적</span>
-        <span id="hud-runscore" style="font-size:13px;color:rgba(255,215,0,0.85);font-weight:bold;letter-spacing:0.5px">0</span>
+  <div id="hud-top" style="position:absolute;top:env(safe-area-inset-top,0);left:0;right:0;padding:12px clamp(10px,3vw,20px);display:flex;justify-content:space-between;align-items:flex-start;font-family:Galmuri11,monospace;text-shadow:0 0 8px rgba(0,0,0,0.9);pointer-events:none;gap:clamp(6px,2vw,14px);">
+    <div class="hud-frame" style="border-color:rgba(255,215,0,0.3);padding:7px clamp(10px,2.2vw,16px);flex:0 1 auto;min-width:0">
+      <div class="hud-label" style="color:rgba(255,215,0,0.85);font-size:clamp(9px,2.4vw,12px);letter-spacing:2px;white-space:nowrap">점수</div>
+      <div id="hud-score" style="font-size:clamp(24px,7vw,38px);color:var(--gold);font-weight:bold;animation:hud-pulse-gold 3s ease-in-out infinite;letter-spacing:1px;line-height:1.1">0</div>
+      <div id="hud-runscore-wrap" style="display:none;align-items:baseline;gap:5px;margin-top:1px">
+        <span style="font-size:8px;color:rgba(255,215,0,0.55);letter-spacing:1px;font-weight:bold;white-space:nowrap">누적</span>
+        <span id="hud-runscore" style="font-size:12px;color:rgba(255,215,0,0.85);font-weight:bold;letter-spacing:0.5px">0</span>
       </div>
     </div>
-    <div class="hud-frame" style="text-align:center;border-color:rgba(255,255,255,0.16);min-width:200px;padding:10px 18px">
-      <div id="hud-modifier" style="font-size:11px;color:var(--time);min-height:14px;letter-spacing:1.5px;font-weight:bold;text-shadow:0 0 6px rgba(211,0,197,0.5);display:none"></div>
-      <div id="hud-wave" style="font-size:24px;color:var(--text);font-weight:bold;letter-spacing:4px;line-height:1.2">W 0</div>
-      <div id="hud-identity" style="font-size:12px;color:var(--gold);min-height:14px;max-width:280px;letter-spacing:1px;font-weight:bold;text-shadow:0 0 8px rgba(255,215,0,0.6);display:none"></div>
+    <div class="hud-frame" style="text-align:center;border-color:rgba(255,255,255,0.16);padding:7px clamp(10px,2.4vw,18px);flex:0 0 auto">
+      <div class="hud-label" style="color:rgba(255,255,255,0.45);font-size:clamp(8px,2vw,10px);letter-spacing:2px;white-space:nowrap">WAVE</div>
+      <div id="hud-wave" style="font-size:clamp(20px,5.5vw,28px);color:var(--text);font-weight:bold;letter-spacing:2px;line-height:1.1">W0</div>
     </div>
-    <div class="hud-frame" style="text-align:right;border-color:rgba(5,217,232,0.3);padding:10px 18px">
-      <div class="hud-label" style="color:rgba(5,217,232,0.85);font-size:12px;letter-spacing:3px">TIME</div>
-      <div id="hud-time" style="font-size:38px;color:var(--ice);font-weight:bold;letter-spacing:1px;text-shadow:0 0 10px rgba(5,217,232,0.5);line-height:1.1">30.0</div>
+    <div class="hud-frame" style="text-align:right;border-color:rgba(5,217,232,0.3);padding:7px clamp(10px,2.2vw,16px);flex:0 1 auto;min-width:0">
+      <div class="hud-label" style="color:rgba(5,217,232,0.85);font-size:clamp(9px,2.4vw,12px);letter-spacing:2px;white-space:nowrap">TIME</div>
+      <div id="hud-time" style="font-size:clamp(24px,7vw,38px);color:var(--ice);font-weight:bold;letter-spacing:1px;text-shadow:0 0 10px rgba(5,217,232,0.5);line-height:1.1">30.0</div>
     </div>
+  </div>
+
+  <!-- 모디파이어 / Run Identity 콜아웃 — 상단 3칩에서 분리해 중앙 하단 배너로. 칩 폭을 절대 밀지 않음. -->
+  <div id="hud-callout" style="position:absolute;top:calc(env(safe-area-inset-top,0) + 70px);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px;font-family:Galmuri11,monospace;pointer-events:none;text-align:center;max-width:74vw;z-index:8">
+    <div id="hud-modifier" style="font-size:11px;color:#f49bef;letter-spacing:1.5px;font-weight:bold;text-shadow:0 0 6px rgba(211,0,197,0.7);display:none;background:rgba(20,8,34,0.7);border:1px solid rgba(211,0,197,0.45);border-radius:12px;padding:3px 12px;backdrop-filter:blur(4px)"></div>
+    <div id="hud-identity" style="font-size:12px;color:#ffe680;letter-spacing:1px;font-weight:bold;text-shadow:0 0 8px rgba(255,215,0,0.8);display:none;background:rgba(28,20,4,0.7);border:1px solid rgba(255,215,0,0.45);border-radius:12px;padding:3px 14px;backdrop-filter:blur(4px)"></div>
   </div>
 
   <div id="hud-boss" style="position:absolute;top:128px;left:50%;transform:translateX(-50%);min-width:340px;max-width:90vw;padding:10px 18px;background:linear-gradient(135deg,rgba(255,42,109,.55),rgba(177,74,255,.4));border:2px solid var(--fire);display:none;font-family:Galmuri11,monospace;color:#fff;border-radius:10px;animation:hud-boss-pulse 1.2s ease-in-out infinite;backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(255,42,109,0.4);">
@@ -226,6 +231,7 @@ app.appendChild(screenHost);
 
 const $score = document.getElementById('hud-score')!;
 const $runScore = document.getElementById('hud-runscore')!;
+const $runScoreWrap = document.getElementById('hud-runscore-wrap')!;
 const $time = document.getElementById('hud-time')!;
 const $wave = document.getElementById('hud-wave')!;
 const $life = document.getElementById('hud-life')!;
@@ -462,11 +468,18 @@ engine.subscribeState((s) => {
   if (s.hideScore) {
     $score.textContent = '???';
     $runScore.textContent = '???';
+    ($runScoreWrap as HTMLElement).style.display = 'none';
   } else {
     tweenScore(s.coins);
     checkScoreMilestone(s.coins);
-    // 누적 점수 — wave 사이 리셋되지 않는 진짜 cumulative
-    $runScore.textContent = formatNum(s.totalScore + s.coins);
+    // 누적 점수 — wave 사이 리셋되지 않는 진짜 cumulative.
+    // W1(totalScore===0)엔 큰 숫자와 동일 → 중복 노이즈라 숨김. W2부터만 노출.
+    if (s.totalScore > 0) {
+      $runScore.textContent = formatNum(s.totalScore + s.coins);
+      ($runScoreWrap as HTMLElement).style.display = 'flex';
+    } else {
+      ($runScoreWrap as HTMLElement).style.display = 'none';
+    }
   }
   $time.textContent = s.waveTimeRemaining.toFixed(1);
   // ⭐ 마지막 5초 — 시간 색 빨강으로 + 펄스 강조 ("픽업 폭우" 시각 cue)
