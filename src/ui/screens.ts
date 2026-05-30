@@ -1373,14 +1373,16 @@ export function mountTutorial(host: HTMLElement, _engine: Engine): () => void {
   panel.appendChild(el('div', `${corner('bottom:8px;left:8px')};border-right:none;border-top:none`));
   panel.appendChild(el('div', `${corner('bottom:8px;right:8px')};border-left:none;border-top:none`));
 
-  // 큰 한자 글리프 (배경 우측, overflow hidden 으로 절대 안 깨짐)
+  // 배경 워터마크 글리프 (영어 단어라 작게 — 이전 160~240px 는 단어가 패널 밖으로 넘쳐
+  //  일부만 보여 "너무 커서 안 보임". 우하단 faint 워터마크로 컨테인.)
   const stepGlyph = el('div', `
-    position:absolute;right:-15%;top:50%;transform:translateY(-50%);
+    position:absolute;right:4%;bottom:6%;
     font-family:Galmuri11,monospace;
-    font-size:clamp(160px, 26vw, 240px);
-    color:rgba(255,215,0,0.06);
+    font-size:clamp(34px, 6vw, 64px);
+    font-weight:bold;letter-spacing:2px;
+    color:rgba(255,215,0,0.07);
     pointer-events:none;user-select:none;
-    text-shadow:0 0 40px rgba(255,215,0,0.2);
+    text-shadow:0 0 24px rgba(255,215,0,0.18);
     line-height:1;
     z-index:0;
   `, '');
@@ -1401,13 +1403,14 @@ export function mountTutorial(host: HTMLElement, _engine: Engine): () => void {
   const stepTitle = el('h2', `
     font-family:Galmuri11,monospace;
     margin:0 0 12px;
-    font-size:clamp(26px, 4vw, 38px);
-    letter-spacing:clamp(2px, 0.6vw, 6px);
+    font-size:clamp(24px, 4vw, 38px);
+    letter-spacing:clamp(1px, 0.5vw, 5px);
     background:linear-gradient(90deg, #05d9e8, #ffd700, #ff2a6d);
     -webkit-background-clip:text;background-clip:text;
     color:transparent;
     text-shadow:0 0 30px rgba(5,217,232,0.4);
     font-weight:bold;
+    word-break:keep-all;overflow-wrap:break-word;line-height:1.25;
   `, '');
   content.appendChild(stepTitle);
 

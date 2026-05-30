@@ -1600,6 +1600,13 @@ function showIdentityRitual(identityId: string) {
 
 // 미니멀 3-2-1-GO 카운트다운 — 숫자만(서브라벨/링/슈퍼노바 제거)
 function countdown(wave: number) {
+  // ⭐ 카드 선택/의식/레벨업 중에는 3-2-1 을 띄우지 않는다 (사용자: "카드 선택 중엔 시간 정지").
+  //   픽이 끝나 play 화면으로 돌아온 뒤에 카운트다운 → 화면 가림/겹침 원천 차단.
+  //   (countdownEndsAt 는 '실제 표시 시점'에 설정 → 18회차 레벨업 모달 게이트와 완전 상호배타.)
+  if (getScreen() !== 'play' || document.getElementById('levelup-modal')) {
+    setTimeout(() => countdown(wave), 120);
+    return;
+  }
   countdownEndsAt = performance.now() + 420 * 4;
   if (!document.getElementById('cd-anim')) {
     const st = document.createElement('style');

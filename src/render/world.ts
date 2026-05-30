@@ -2563,19 +2563,27 @@ function drawPickup(p: Pickup, cx: number, cy: number, W: number, H: number, t: 
       break;
     }
     case 'xp': {
-      ctx.shadowColor = '#05d9e8';
+      // ⭐ 적(부드러운 빨강 글로우 블롭)과 확실히 구분되게 "또렷한 수집 결정"으로:
+      //   밝은 시안 + 흰 테두리 + 글로우. 적엔 흰 테두리·다이아몬드 형태를 절대 안 써 = 단일 구분 규칙.
       ctx.save();
       ctx.translate(sx, sy);
       ctx.rotate(Math.PI / 4 + t / 1500);
-      const grad = ctx.createLinearGradient(-p.radius, -p.radius, p.radius, p.radius);
-      grad.addColorStop(0, '#80f0ff');
-      grad.addColorStop(0.5, '#05d9e8');
+      const s = p.radius * 1.5;
+      ctx.shadowColor = '#05d9e8'; ctx.shadowBlur = 14;
+      const grad = ctx.createLinearGradient(-s / 2, -s / 2, s / 2, s / 2);
+      grad.addColorStop(0, '#bdf7ff');
+      grad.addColorStop(0.5, '#22e0f0');
       grad.addColorStop(1, '#0288a8');
       ctx.fillStyle = grad;
-      ctx.fillRect(-p.radius / 1.4, -p.radius / 1.4, p.radius * 1.4, p.radius * 1.4);
+      ctx.fillRect(-s / 2, -s / 2, s, s);
       ctx.shadowBlur = 0;
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.fillRect(-p.radius / 1.4, -p.radius / 1.4, p.radius * 1.4, 1);
+      // 또렷한 흰 테두리 — 결정/보석 느낌 (적 블롭엔 없음)
+      ctx.strokeStyle = 'rgba(255,255,255,0.92)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(-s / 2, -s / 2, s, s);
+      // 상단 하이라이트
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.fillRect(-s / 2, -s / 2, s, 1.5);
       ctx.restore();
       break;
     }

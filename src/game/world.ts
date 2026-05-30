@@ -163,7 +163,7 @@ export type PropKind = 'blackhole' | 'shrine' | 'wreck' | 'asteroid' | 'lantern'
 // 솔리드(통과 불가) prop set — 충돌 처리에서 자주 비교
 const SOLID_KINDS = new Set<PropKind>(['monolith', 'rocks', 'ruins', 'mirror_shard']);
 // 파괴 가능 prop set — 발사체/영역효과가 데미지 줄 수 있음
-const DESTRUCTIBLE_KINDS = new Set<PropKind>(['shrine', 'wreck', 'asteroid', 'monolith', 'rocks', 'ruins', 'beacon', 'cursed_totem']);
+export const DESTRUCTIBLE_KINDS = new Set<PropKind>(['shrine', 'wreck', 'asteroid', 'monolith', 'rocks', 'ruins', 'beacon', 'cursed_totem']);
 
 export interface WorldProp {
   id: number;
@@ -1680,6 +1680,16 @@ export function tickWorld(world: World, dt: number, t: number, state: GameState,
 
   // ── 무기 자동 발사 ──
   applyWeapons(world, dt, t, state);
+
+  // ⭐ 직접 hp 차감 무기(발톱·체인 등)로 hp<=0 된 파괴가능 프롭 파괴 — 충돌 루프 밖 단일 sweep.
+  //   이전엔 이 sweep 이 없어 발톱이 hp 만 깎고 프롭이 안 부서지던 버그(좀비 프롭).
+  //   wreck 은 hits 기반(hp 미사용)이라 제외. destroyProp 은 destroyedAt 마킹만(splice X) → for-of 안전.
+  for (const p of world.props) {
+    if (p.destroyedAt || p.kind === 'wreck') continue;
+    if (p.hpMax > 0 && p.hp <= 0 && DESTRUCTIBLE_KINDS.has(p.kind)) {
+      destroyProp(world, p, t, events, p.kind);
+    }
+  }
 
   // ── 보스 패턴 FSM (vel 을 직접 세팅하므로 AI 루프 보다 먼저) ──
   if (world.bossRuntime && world.bossInstance) {

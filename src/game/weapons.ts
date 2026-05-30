@@ -6,7 +6,7 @@
 
 import { rng } from './cards.js';
 import type { Card, CardTag, GameState } from './types.js';
-import { nearestTarget, spawnAreaEffect, spawnProjectile, type Vec, type World } from './world.js';
+import { DESTRUCTIBLE_KINDS, nearestTarget, spawnAreaEffect, spawnProjectile, type Vec, type World } from './world.js';
 import { spawnAttackFx } from '../render/attacks.js';
 
 export interface Weapon {
@@ -80,6 +80,24 @@ function makeClaw(): Weapon {
         if (da > Math.PI) da = Math.PI * 2 - da;
         if (da < Math.PI / 3) {
           e.hp -= dmg;
+        }
+      }
+      // ⭐ 파괴 가능한 프롭(박스/장애물)도 부채꼴로 타격 (이전: 적만 때려 발톱이 오브젝트
+      //   피격 안 되던 버그). 적이 없으면 nearestTarget 이 프롭을 조준 → 부숨. 부채꼴은 적보다
+      //   살짝 넓게(피격 판정 관대 — 게임필). 파괴는 다음 틱 prop 검사에 위임(weapons.ts 패턴).
+      for (const p of w.props) {
+        if (p.hp <= 0 || p.destroyedAt || !DESTRUCTIBLE_KINDS.has(p.kind)) continue;
+        const px = p.pos.x - w.player.pos.x;
+        const py = p.pos.y - w.player.pos.y;
+        const d = Math.hypot(px, py);
+        if (d > range + p.radius) continue;
+        const pa = Math.atan2(py, px);
+        let da = Math.abs(pa - a0);
+        if (da > Math.PI) da = Math.PI * 2 - da;
+        if (da < Math.PI / 2.5) {
+          p.hp -= dmg;
+          p.hitFlashUntil = t + 100;
+          if (p.hp < 0) p.hp = 0;
         }
       }
       // 시각 효과를 위해 player.facing 갱신
