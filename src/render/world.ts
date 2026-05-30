@@ -1989,12 +1989,24 @@ function drawEnemy(e: Enemy, cx: number, cy: number, W: number, H: number, t: nu
   const attacking = (e.kind === 'shooter' || e.kind === 'summoner') && e.attackCd < 0.4 && e.attackCd > 0;
   const breathScale = attacking ? 1 + (0.4 - e.attackCd) * 0.4 : 1;
 
-  // 그라운드 그림자 (먼저 — 본체 뒤에)
+  // ⭐ 위협 시그니처 + 그라운딩 — 모든 적 공통.
+  //  (1) 진한 접지 그림자 → "땅에 놓인" 느낌(붕뜸 방지)
+  //  (2) 빨강 위협 underglow → 색이 친화적(초록 wonwi/회색 jab)이어도 "이건 날 해친다"가 한눈에.
+  //  픽업엔 절대 빨강을 쓰지 않으므로, 빨강 오라 = 적 = 위협 이라는 단일 규칙이 성립.
   ctx.save();
-  ctx.fillStyle = 'rgba(0,0,0,0.42)';
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
   ctx.beginPath();
-  ctx.ellipse(sx, sy + e.radius * 0.85, e.radius * 0.85, e.radius * 0.22, 0, 0, Math.PI * 2);
+  ctx.ellipse(sx, sy + e.radius * 0.9, e.radius * 0.95, e.radius * 0.26, 0, 0, Math.PI * 2);
   ctx.fill();
+  if (!flashing) {
+    const threatPulse = 0.5 + 0.5 * Math.sin(t / 360 + e.id);
+    const tgrad = ctx.createRadialGradient(sx, sy, e.radius * 0.35, sx, sy, e.radius * 1.75);
+    tgrad.addColorStop(0, `rgba(255, 38, 68, ${0.24 + 0.12 * threatPulse})`);
+    tgrad.addColorStop(0.65, 'rgba(255, 38, 68, 0.06)');
+    tgrad.addColorStop(1, 'rgba(255, 38, 68, 0)');
+    ctx.fillStyle = tgrad;
+    ctx.beginPath(); ctx.arc(sx, sy, e.radius * 1.75, 0, Math.PI * 2); ctx.fill();
+  }
   ctx.restore();
 
   // ⭐ Elite 표식 — 빨간 외곽 링 + 펄스 + "ELITE" 라벨
@@ -2073,7 +2085,10 @@ function drawEnemy(e: Enemy, cx: number, cy: number, W: number, H: number, t: nu
   if (sprite && !flashing) {
     const size = e.radius * 2.4;
     ctx.imageSmoothingEnabled = false;
+    // ⭐ 위협 림 — 스프라이트가 귀여워도(회색 jab 등) 빨강 실루엣 글로우로 "적" 인지.
+    if (!burning) { ctx.shadowColor = 'rgba(255,38,68,0.85)'; ctx.shadowBlur = 7; }
     ctx.drawImage(sprite, -size / 2, -size / 2, size, size);
+    ctx.shadowBlur = 0;
   } else if (flashing) {
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
@@ -2105,22 +2120,27 @@ function drawEnemy(e: Enemy, cx: number, cy: number, W: number, H: number, t: nu
     const corePulse = 0.6 + 0.4 * Math.sin(t / 240 + e.id);
     ctx.fillStyle = `rgba(255, 60, 90, ${corePulse * 0.4})`;
     ctx.beginPath(); ctx.arc(0, 0, e.radius * 0.45, 0, Math.PI * 2); ctx.fill();
-    // 빛나는 눈 (시안 + 코어 흰점) + 위협 줄무늬
-    const eyeGlow = 0.7 + 0.3 * Math.sin(t / 180);
-    ctx.shadowColor = '#05d9e8';
-    ctx.shadowBlur = 4;
-    ctx.fillStyle = `rgba(5, 217, 232, ${eyeGlow})`;
-    ctx.beginPath(); ctx.arc(-e.radius * 0.3, -e.radius * 0.18, 2.5, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(e.radius * 0.3, -e.radius * 0.18, 2.5, 0, Math.PI * 2); ctx.fill();
+    // ⭐ 성난 표정 — 안쪽으로 기운 빨강 삼각눈 + 찌푸린 입. (이전 시안 미소 = 친화적 → 위협 인지로 교정)
+    const eyeGlow = 0.75 + 0.25 * Math.sin(t / 160 + e.id);
+    ctx.shadowColor = '#ff2840';
+    ctx.shadowBlur = 5;
+    ctx.fillStyle = `rgba(255, 70, 60, ${eyeGlow})`;
+    for (const dir of [-1, 1]) {
+      ctx.save();
+      ctx.translate(dir * e.radius * 0.32, -e.radius * 0.15);
+      ctx.rotate(dir * 0.5);
+      ctx.beginPath(); ctx.ellipse(0, 0, 3.2, 2, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
     ctx.shadowBlur = 0;
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.arc(-e.radius * 0.3, -e.radius * 0.18, 0.8, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(e.radius * 0.3, -e.radius * 0.18, 0.8, 0, Math.PI * 2); ctx.fill();
-    // 입 (어둠)
-    ctx.strokeStyle = darken(e.color, 0.7);
-    ctx.lineWidth = 1.2;
+    ctx.fillStyle = '#fff2a0';
+    ctx.beginPath(); ctx.arc(-e.radius * 0.32, -e.radius * 0.15, 0.9, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(e.radius * 0.32, -e.radius * 0.15, 0.9, 0, Math.PI * 2); ctx.fill();
+    // 찌푸린 입 (위로 볼록 = frown)
+    ctx.strokeStyle = 'rgba(20,0,5,0.85)';
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
-    ctx.arc(0, e.radius * 0.25, e.radius * 0.3, 0.2, Math.PI - 0.2);
+    ctx.arc(0, e.radius * 0.55, e.radius * 0.32, Math.PI + 0.3, Math.PI * 2 - 0.3);
     ctx.stroke();
   }
   // 피격 흰 플래시 오버레이 (스프라이트 위에)
@@ -2475,6 +2495,14 @@ function drawPickup(p: Pickup, cx: number, cy: number, W: number, H: number, t: 
   if (sx < -30 || sx > W + 30 || sy < -30 || sy > H + 30) return;
   const pulse = Math.max(0.1, 1 + Math.sin(t / 150 + p.id) * 0.15);
   const aura = PICKUP_AURA[p.kind] ?? '#ffd700';
+
+  // ⭐ 접지 그림자 — 픽업이 공중에 붕 뜨지 않게 (모든 종류). 적 그림자보다 옅게 = 보상 톤.
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.26)';
+  ctx.beginPath();
+  ctx.ellipse(sx, sy + p.radius * 1.15, p.radius * 0.7, p.radius * 0.2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
 
   // ⭐ 지면 헤일로 — 모든 픽업에 펄스 ring + 외곽 글로우 추가 (보상 인지)
   ctx.save();

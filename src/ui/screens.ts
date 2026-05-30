@@ -715,13 +715,17 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
   }
 
   // ── 메인 컨텐츠 (중앙 정렬, panel-rise 애니) ──
+  // ⭐ PC 세로 잘림 fix: 콘텐츠가 뷰포트보다 크면 justify-content:center 가 위/아래를 동시에
+  // 잘라먹음(로고+메뉴 클립). `safe center` = 들어가면 중앙, 넘치면 위 정렬+스크롤 → 절대 안 잘림.
   const main = el('div', `
     position:relative;z-index:5;
     height:100%;
+    overflow-y:auto;overflow-x:hidden;
     display:flex;flex-direction:column;
-    align-items:center;justify-content:center;
-    padding:clamp(20px, 4vh, 48px) clamp(16px, 4vw, 40px);
+    align-items:center;justify-content:safe center;
+    padding:clamp(16px, 3vh, 40px) clamp(16px, 4vw, 40px);
     box-sizing:border-box;
+    -webkit-overflow-scrolling:touch;
   `);
 
   // 윤회 링 (회전 광채 — 캐릭터 뒤에)
@@ -771,8 +775,8 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
   const title = el('h1', `
     position:relative;z-index:2;
     font-family:Galmuri11,monospace;
-    font-size:clamp(56px, 11vw, 160px);
-    margin:0;letter-spacing:clamp(6px, 1vw, 16px);
+    font-size:clamp(44px, 7.5vw, 108px);
+    margin:0;letter-spacing:clamp(4px, 0.8vw, 12px);
     background:linear-gradient(90deg, #ff5b8f 0%, #ffe055 32%, #ffffff 50%, #4ee3f0 68%, #c490ff 100%);
     -webkit-background-clip:text;background-clip:text;
     -webkit-text-fill-color:transparent;
@@ -813,20 +817,20 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
   main.appendChild(el('div', `
     position:relative;z-index:2;
     font-size:clamp(16px, 1.7vw, 22px);
-    color:#d8e1ff;margin:0 0 36px;text-align:center;
+    color:#d8e1ff;margin:0 0 20px;text-align:center;
     font-family:Galmuri11,monospace;letter-spacing:2px;
     text-shadow:0 1px 0 #000, 0 0 8px rgba(170,204,255,0.45);
     animation:panel-rise .8s ease-out .5s both;
   `, '— 죽은 자의 별빛이 다시 깨어나는 곳 —'));
 
-  // ── 캐릭터 (중앙 큰 에이전트) ──
+  // ── 캐릭터 (중앙 큰 에이전트) — PC 세로 절약 위해 max 축소 (모바일은 min 값 유지) ──
   const charBox = el('div', `
     position:relative;z-index:3;
-    width:clamp(160px, 22vw, 320px);
-    height:clamp(160px, 22vw, 320px);
+    width:clamp(140px, 14vw, 210px);
+    height:clamp(140px, 14vw, 210px);
     background:url(/character/${character}.svg) no-repeat center/contain;
     image-rendering:pixelated;
-    margin:8px 0 24px;
+    margin:4px 0 16px;
     animation:float 3s ease-in-out infinite alternate, panel-rise 1s ease-out .6s both;
     filter:drop-shadow(0 8px 24px rgba(255,42,109,0.5));
   `);
