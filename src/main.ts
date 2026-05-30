@@ -333,7 +333,8 @@ function showInputHintForNewPlayer(): void {
   if (!el) return;
   // 터치 우선 환경 감지 — coarse pointer (모바일/터치 패널). 데스크톱은 fine.
   const isTouch = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
-  el.textContent = isTouch ? '👆 화면 어디든 드래그하여 이동' : '⌨ W A S D · ← ↑ ↓ → 로 이동';
+  // 이동 + 핵심 개념(무기 자동 공격) 한 줄 — survivor-like 신규 유저는 "공격 버튼이 없다"를 모름.
+  el.textContent = isTouch ? '👆 드래그로 이동 · 무기는 자동 공격' : '⌨ WASD·방향키 이동 · 무기는 자동 공격';
   el.style.display = 'block';
   el.style.animation = 'input-hint-pulse 2.2s ease-in-out infinite';
   _inputHintActive = true;
@@ -2041,8 +2042,15 @@ function renderWeaponHud() {
   const TAG_EMOJI: Record<string, string> = { fire: '🔥', ice: '❄️', gold: '💰', time: '⏱️', chaos: '🌀', echo: '🪞' };
   const TAG_COLOR: Record<string, string> = { fire: '#ff2a6d', ice: '#05d9e8', gold: '#ffd700', time: '#d300c5', chaos: '#ff6f00', echo: '#b3ff00' };
 
+  // ⭐ FTUE — 첫 사이클(totalCycles===0) 초반(W≤2)엔 아이콘 옆에 무기 이름 라벨을 붙인다.
+  //   사용자 "초반에 가진 스킬이 뭔지도 모르겠다" → 신규 유저는 아이콘만으론 무기를 인지 못 함.
+  //   1런 생존 후/W3+ 부터는 라벨 접고 깔끔한 아이콘 레일로 복귀 (progressive disclosure).
+  const meta = engine.getState().meta as any;
+  const teach = (meta.totalCycles ?? 0) === 0 && engine.getState().wave <= 2;
+
   // 구조 signature — 변하면 innerHTML 전면 재생성. 평소엔 cooldown 만 부분 업데이트.
-  const sig = world.weapons.map(w => `${w.id}|${w.level}|${w.evolved ? 1 : 0}|${w.tag}|${(w as any).displayName ?? ''}`).join(';');
+  // teach 플래그도 시그니처에 포함 → 교육 구간 종료(W3 진입) 시 라벨 자동 제거.
+  const sig = (teach ? 'T|' : 'I|') + world.weapons.map(w => `${w.id}|${w.level}|${w.evolved ? 1 : 0}|${w.tag}|${(w as any).displayName ?? ''}`).join(';');
 
   if (sig !== _lastWeaponSig) {
     _lastWeaponSig = sig;
@@ -2055,17 +2063,21 @@ function renderWeaponHud() {
       const border = evolved ? '#ffd700' : 'rgba(255,255,255,0.18)';
       const shadow = evolved ? '0 0 14px rgba(255,215,0,0.45)' : '0 3px 8px rgba(0,0,0,0.4)';
       const name = (w as any).displayName ?? (w.id.startsWith('starter_') ? 'STARTER' : w.tag.toUpperCase());
+      // 교육 라벨 — 아이콘 왼쪽(레일이 우측 정렬이므로 왼쪽으로 자란다). 이름만, 짧게.
+      const label = teach
+        ? `<div style="font-size:11px;color:${evolved ? '#ffd700' : ringColor};font-weight:bold;letter-spacing:0.5px;background:rgba(10,10,26,0.78);border:1px solid ${ringColor}55;border-radius:9px;padding:4px 9px;white-space:nowrap;text-shadow:0 0 6px rgba(0,0,0,0.9);box-shadow:0 2px 8px rgba(0,0,0,0.4);backdrop-filter:blur(4px);">${name}</div>`
+        : '';
       // title = 데스크톱 hover 시 이름/레벨 확인 (시각 클러터 0, 접근성 보조)
-      return `
-        <div data-wpn-idx="${idx}" title="${name} · Lv.${w.level} · ${w.cooldownMax.toFixed(1)}s" style="position:relative;width:46px;height:46px;border-radius:50%;background:rgba(10,10,26,0.6);border:1px solid ${border};box-shadow:${shadow};backdrop-filter:blur(6px);">
+      const circle = `
+        <div data-wpn-idx="${idx}" title="${name} · Lv.${w.level} · ${w.cooldownMax.toFixed(1)}s" style="position:relative;width:46px;height:46px;flex-shrink:0;border-radius:50%;background:rgba(10,10,26,0.6);border:1px solid ${border};box-shadow:${shadow};backdrop-filter:blur(6px);">
           <div data-cd-wrap="${idx}" data-ring="${ringColor}" style="position:absolute;inset:3px;border-radius:50%;">
             <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);border-radius:50%;border:1px solid rgba(255,255,255,0.1);"></div>
             <div data-cd-fill="${idx}" style="position:absolute;inset:0;background:conic-gradient(${ringColor} 0%,transparent 0);border-radius:50%;mask:radial-gradient(circle, transparent 56%, black 58%);-webkit-mask:radial-gradient(circle, transparent 56%, black 58%);filter:drop-shadow(0 0 4px ${ringColor}88);"></div>
             <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:19px;">${emoji}</div>
           </div>
           <div style="position:absolute;bottom:-3px;right:-3px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:${evolved ? '#ffd700' : '#0a0a1a'};border:1px solid ${ringColor};color:${evolved ? '#0a0a1a' : ringColor};font-size:9px;font-weight:bold;line-height:13px;text-align:center;font-family:Galmuri11,monospace;">${evolved ? '★' : w.level}</div>
-        </div>
-      `;
+        </div>`;
+      return `<div style="display:flex;align-items:center;justify-content:flex-end;gap:7px;">${label}${circle}</div>`;
     }).join('');
     $weaponsHud.innerHTML = items;
   }
