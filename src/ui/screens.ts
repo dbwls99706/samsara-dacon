@@ -1107,15 +1107,22 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
   }
 
   // 작은 메뉴 버튼들 (2열 그리드)
+  // ⭐ 첫 방문(totalCycles===0)엔 상점/도감/리더보드/업적이 전부 비어있음 → 숨겨서 화면을
+  //   "큰 시작 버튼" 하나로 단순화(진입 명료). 1런 뒤 콘텐츠가 생기면 전체 메뉴 노출.
+  const firstTime = (meta.totalCycles ?? 0) === 0;
   const subMenu = el('div', `display:grid;grid-template-columns:1fr 1fr;gap:clamp(6px, 1vw, 10px)`);
   const items: [string, string, () => void][] = [
     ['🎭', '캐릭터', () => go('characterSelect')],
-    ['🏆', `상점 (${meta.rp} RP)`, () => go('metaShop')],
-    ['📚', '도감', () => go('codex')],
-    ['👑', '리더보드', () => go('leaderboard')],
-    ['📜', '업적', () => go('achievements')],
-    ['⚙️', '설정', () => go('settings')],
   ];
+  if (!firstTime) {
+    items.push(
+      ['🏆', `상점 (${meta.rp} RP)`, () => go('metaShop')],
+      ['📚', '도감', () => go('codex')],
+      ['👑', '리더보드', () => go('leaderboard')],
+      ['📜', '업적', () => go('achievements')],
+    );
+  }
+  items.push(['⚙️', '설정', () => go('settings')]);
   if (seenTutorial) items.push(['📖', '튜토리얼', () => go('tutorial')]);
   for (const [icon, label, click] of items) {
     const b = document.createElement('button');

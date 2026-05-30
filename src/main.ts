@@ -133,9 +133,9 @@ playRoot.innerHTML = `
   </div>
 
   <!-- 모디파이어 / Run Identity 콜아웃 — 상단 3칩에서 분리해 중앙 하단 배너로. 칩 폭을 절대 밀지 않음. -->
-  <div id="hud-callout" style="position:absolute;top:calc(env(safe-area-inset-top,0) + 70px);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px;font-family:Galmuri11,monospace;pointer-events:none;text-align:center;max-width:74vw;z-index:8">
-    <div id="hud-modifier" style="font-size:11px;color:#f49bef;letter-spacing:1.5px;font-weight:bold;text-shadow:0 0 6px rgba(211,0,197,0.7);display:none;background:rgba(20,8,34,0.7);border:1px solid rgba(211,0,197,0.45);border-radius:12px;padding:3px 12px;backdrop-filter:blur(4px)"></div>
-    <div id="hud-identity" style="font-size:12px;color:#ffe680;letter-spacing:1px;font-weight:bold;text-shadow:0 0 8px rgba(255,215,0,0.8);display:none;background:rgba(28,20,4,0.7);border:1px solid rgba(255,215,0,0.45);border-radius:12px;padding:3px 14px;backdrop-filter:blur(4px)"></div>
+  <div id="hud-callout" style="position:absolute;top:calc(env(safe-area-inset-top,0) + 108px);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px;font-family:Galmuri11,monospace;pointer-events:none;text-align:center;max-width:74vw;z-index:8">
+    <div id="hud-modifier" style="font-size:11px;color:#ffc2f3;letter-spacing:1.5px;font-weight:bold;text-shadow:0 0 6px rgba(211,0,197,0.9);display:none;background:rgba(24,8,38,0.9);border:1px solid rgba(255,90,230,0.55);border-radius:12px;padding:4px 13px;backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,0.5)"></div>
+    <div id="hud-identity" style="font-size:12px;color:#ffe680;letter-spacing:1px;font-weight:bold;text-shadow:0 0 8px rgba(255,215,0,0.9);display:none;background:rgba(32,22,4,0.9);border:1px solid rgba(255,215,0,0.55);border-radius:12px;padding:4px 14px;backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,0.5)"></div>
   </div>
 
   <div id="hud-boss" style="position:absolute;top:128px;left:50%;transform:translateX(-50%);min-width:340px;max-width:90vw;padding:10px 18px;background:linear-gradient(135deg,rgba(255,42,109,.55),rgba(177,74,255,.4));border:2px solid var(--fire);display:none;font-family:Galmuri11,monospace;color:#fff;border-radius:10px;animation:hud-boss-pulse 1.2s ease-in-out infinite;backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(255,42,109,0.4);">
