@@ -9,7 +9,7 @@ import { allCards, allSynergies, allRunIdentities, allModifierDefs, formatNum, t
 import { BIOME_KINDS } from '../game/terrain.js';
 import type { Card, CardTag, Rarity } from '../game/types.js';
 import { setBgmVolume } from '../audio/bgm.js';
-import { setSfxVolume } from '../audio/sfx.js';
+import { playSfx, setSfxVolume } from '../audio/sfx.js';
 import { go } from './router.js';
 import { setLang, t } from '../i18n.js';
 import { allAchievements, loadTracker, saveTracker, trackCardPick } from '../game/achievements.js';
@@ -1579,6 +1579,7 @@ export function mountTutorial(host: HTMLElement, _engine: Engine): () => void {
 
 export function mountCardPick(host: HTMLElement, engine: Engine): () => void {
   host.innerHTML = '';
+  playSfx('sfx_card_appear', 0.45); // 카드 등장음 (이전엔 sfx.json 에 있으나 미배선 orphan)
   const state = engine.getState();
   const choices = engine.drawCardChoices(3 + state.extraCardChoiceCount);
 
@@ -1812,6 +1813,7 @@ export function mountRitual(host: HTMLElement, engine: Engine): () => void {
       c.style.animation = 'ri-card-glow 3.5s ease-in-out infinite';
     };
     c.onclick = () => {
+      playSfx('sfx_ritual_select', 0.6); // 의식 선택음 (이전 orphan)
       r.apply(engine.getState() as any);
       go('play');
       setTimeout(() => {

@@ -254,6 +254,10 @@ const $identity = document.getElementById('hud-identity')!;
 // 카운트다운 종료 시각(ms). 이 동안 TEXT_BANNER(모디파이어 이름 등)는 중앙 3-2-1 과 겹침 방지로 보류.
 // (TDZ 가드: TEXT_BANNER 핸들러보다 먼저 선언 — feedback_subscribestate_tdz 패턴.)
 let countdownEndsAt = 0;
+// 보스 피격음 throttle — 보스가 데미지를 받을 때 sfx_boss_hit(이전 orphan)을 150ms 간격으로만
+// 재생(매 히트 클리핑 방지). (TDZ 가드: subscribeState 콜백보다 먼저 선언.)
+let _bossHpPrev = -1;
+let _bossHitSfxAt = 0;
 const $boss = document.getElementById('hud-boss')!;
 const $bossName = document.getElementById('hud-boss-name')!;
 const $bossHpText = document.getElementById('hud-boss-hp-text')!;
@@ -554,6 +558,12 @@ engine.subscribeState((s) => {
       $bossName.textContent = `👹 BOSS · ${(s.bossKind ?? 'normal').toUpperCase()}`;
       $bossHpText.textContent = `${Math.max(0, boss.hp).toFixed(0)} / ${boss.hpMax}`;
       ($bossHpBar as HTMLElement).style.width = `${ratio * 100}%`;
+      // 보스 피격음 — HP 감소 감지 시 throttle(150ms) 재생. 보스에 데미지가 박히는 청각 피드백.
+      if (boss.hp < _bossHpPrev) {
+        const nowMs = performance.now();
+        if (nowMs - _bossHitSfxAt > 150) { playSfx('sfx_boss_hit', 0.5); _bossHitSfxAt = nowMs; }
+      }
+      _bossHpPrev = boss.hp;
       // 저체력 시 색 변환 (적 → 빨강 fade)
       if (ratio < 0.25) {
         ($bossHpBar as HTMLElement).style.background = 'linear-gradient(90deg,#ff0044,#ff8800,#ff0044)';

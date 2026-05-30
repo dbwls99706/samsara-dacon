@@ -234,6 +234,9 @@ function handleTick(state: GameState, dt: number, t: number, emit: (e: EngineEve
         state.combo = 0;
         emit({ type: 'COMBO_CHANGE', from: before, to: 0, reason: 'idle' });
         emit({ type: 'SFX', id: 'sfx_combo_break' });
+        // 콤보 끊김 → 클라이맥스 BGM 레이어(L4/index3) OFF. 이전엔 웨이브 시작 때만 꺼져
+        // 한 번 50콤보 찍으면 웨이브 내내 박혀있던 stickiness 해소(음악 다이내믹 복원).
+        emit({ type: 'BGM_LAYER', layer: 3, target: 0, ramp: 1.5 });
         dispatchTrigger(state, 'onComboBreak', emit);
       }
     }
@@ -563,11 +566,12 @@ function handlePlayerHit(state: GameState, a: { dmg: number; cause?: string }, e
   state.stats.lastHitWave = state.wave;
   state.stats.lastHitTime = state.elapsed;
   handleLifeLoss(state, emit);
-  // 콤보 끊김
+  // 콤보 끊김 (피격)
   if (state.combo > 0) {
     const before = state.combo;
     state.combo = 0;
     emit({ type: 'COMBO_CHANGE', from: before, to: 0, reason: 'hit' });
+    emit({ type: 'BGM_LAYER', layer: 3, target: 0, ramp: 1.5 }); // 클라이맥스 레이어 OFF (stickiness fix)
   }
 }
 
