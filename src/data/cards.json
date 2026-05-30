@@ -130,7 +130,7 @@
     { "id": "E01", "name_ko": "메아리", "name_en": "Echo", "tags": ["echo"], "rarity": "common",
       "effects": [{ "trigger": "onTap", "op": "echoTap", "delay": 0.3 }] },
     { "id": "E02", "name_ko": "분신", "name_en": "Clone", "tags": ["echo"], "rarity": "common",
-      "effects": [{ "trigger": "onTick", "op": "echoAuto", "value": 1 }] },
+      "effects": [{ "trigger": "onTick", "op": "echoAuto", "value": 4 }] },
     { "id": "E03", "name_ko": "거울", "name_en": "Mirror", "tags": ["echo"], "rarity": "common",
       "effects": [{ "trigger": "onCardPicked", "op": "buffOneCardEffect", "mult": 1.2 }] },
     { "id": "E04", "name_ko": "잔향", "name_en": "Reverberation", "tags": ["echo"], "rarity": "common",
@@ -305,11 +305,17 @@
       "name_ko": "조화의 현자", "name_en": "THE HARMONY", "visual": "rainbow",
       "bonus": [{ "op": "buffAllCardEffects", "mult": 1.5 }] },
 
-    { "id": "id_7fire", "match": { "fire": 7 }, "name_ko": "태양의 화신", "name_en": "THE SUN AVATAR", "visual": "fire_legendary", "legendary": true },
-    { "id": "id_7ice", "match": { "ice": 7 }, "name_ko": "영원한 겨울의 왕", "name_en": "KING OF ETERNAL WINTER", "visual": "ice_legendary", "legendary": true },
-    { "id": "id_7gold", "match": { "gold": 7 }, "name_ko": "잭팟의 신", "name_en": "JACKPOT GOD", "visual": "gold_legendary", "legendary": true },
-    { "id": "id_7time", "match": { "time": 7 }, "name_ko": "시간 자체", "name_en": "TIME ITSELF", "visual": "time_legendary", "legendary": true },
-    { "id": "id_7chaos", "match": { "chaos": 7 }, "name_ko": "나비", "name_en": "THE BUTTERFLY", "visual": "chaos_legendary", "legendary": true },
-    { "id": "id_7echo", "match": { "echo": 7 }, "name_ko": "거울의 회랑", "name_en": "THE HALL", "visual": "echo_legendary", "legendary": true }
+    { "id": "id_7fire", "match": { "fire": 7 }, "name_ko": "태양의 화신", "name_en": "THE SUN AVATAR", "visual": "fire_legendary", "legendary": true,
+      "bonusKo": "콤보 보너스 ×2", "bonus": [{ "op": "buffComboBonus", "mult": 2 }] },
+    { "id": "id_7ice", "match": { "ice": 7 }, "name_ko": "영원한 겨울의 왕", "name_en": "KING OF ETERNAL WINTER", "visual": "ice_legendary", "legendary": true,
+      "bonusKo": "부활 +1 (얼음의 가호)", "bonus": [{ "op": "revive", "value": 1 }] },
+    { "id": "id_7gold", "match": { "gold": 7 }, "name_ko": "잭팟의 신", "name_en": "JACKPOT GOD", "visual": "gold_legendary", "legendary": true,
+      "bonusKo": "코인 획득 ×2 (영구)", "bonus": [{ "op": "coinGainMult", "mult": 2 }] },
+    { "id": "id_7time", "match": { "time": 7 }, "name_ko": "시간 자체", "name_en": "TIME ITSELF", "visual": "time_legendary", "legendary": true,
+      "bonusKo": "모든 웨이브 +10초", "bonus": [{ "op": "extendWaveTime", "value": 10 }] },
+    { "id": "id_7chaos", "match": { "chaos": 7 }, "name_ko": "나비", "name_en": "THE BUTTERFLY", "visual": "chaos_legendary", "legendary": true,
+      "bonusKo": "자동 효과 +1회 발동 (나비효과)", "bonus": [{ "op": "extraTriggerCount", "value": 1 }] },
+    { "id": "id_7echo", "match": { "echo": 7 }, "name_ko": "거울의 회랑", "name_en": "THE HALL", "visual": "echo_legendary", "legendary": true,
+      "bonusKo": "모든 점수 ×2 (거울)", "bonus": [{ "op": "globalScoreMult", "mult": 2 }] }
   ]
 }

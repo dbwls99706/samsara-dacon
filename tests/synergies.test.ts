@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest';
-import { activeSynergies, DATA, getCard, newGameState, recalcAfterCardMutation, setRngSeed } from '../src/game/cards';
+import { activeSynergies, allCards, DATA, evalRunIdentity, getCard, newGameState, recalcAfterCardMutation, setRngSeed } from '../src/game/cards';
+import { reduce } from '../src/game/state';
 import type { Card, EngineEvent } from '../src/game/types';
 
 beforeEach(() => setRngSeed(42));
@@ -89,5 +90,45 @@ describe('Run Identity 카운트', () => {
     expect(single.length).toBeGreaterThanOrEqual(6);
     const legendary = all.filter(r => r.legendary);
     expect(legendary.length).toBe(6);
+  });
+});
+
+// 회귀: 전설 칭호(7장) 기계 효과 — Antigravity QA 가 "28 칭호 중 27개 코스메틱(전설조차
+// 효과 0)" 지적. 결정: 전설 6종에만 버프 추가. 이 테스트가 버프 누락/오타 op 를 잡는다.
+describe('전설 칭호(7장) 버프 — 기계 효과 보장', () => {
+  const TAGS: [string, string][] = [
+    ['fire', 'id_7fire'], ['ice', 'id_7ice'], ['gold', 'id_7gold'],
+    ['time', 'id_7time'], ['chaos', 'id_7chaos'], ['echo', 'id_7echo'],
+  ];
+
+  it('legendary_identities_all_have_valid_bonus_and_label', () => {
+    const legend = DATA.run_identities.filter(r => r.legendary);
+    expect(legend.length).toBe(6);
+    for (const ri of legend) {
+      expect(Array.isArray(ri.bonus)).toBe(true);
+      expect((ri.bonus ?? []).length).toBeGreaterThanOrEqual(1);
+      for (const e of ri.bonus ?? []) expect(typeof (e as any).op).toBe('string');
+      expect(typeof ri.bonusKo).toBe('string'); // 도감/표시용 라벨
+    }
+  });
+
+  it('seven_same_tag_evaluates_to_its_legendary_identity', () => {
+    for (const [tag, id] of TAGS) {
+      const card = allCards().find(c => (c.tags ?? []).length === 1 && c.tags[0] === tag);
+      expect(card, `단일 ${tag} 카드`).toBeTruthy();
+      const seven = Array.from({ length: 7 }, () => card!);
+      expect(evalRunIdentity(seven)?.id).toBe(id); // 7장 = 전설 우선
+    }
+  });
+
+  it('reaching_7_ice_applies_revive_buff_via_live_reducer', () => {
+    // I01(서리) = 단일 ice, 효과 무해(extendComboWindow) → 변형 위험 없이 7장 누적.
+    const ice = getCard('I01')!;
+    const base = newGameState({});
+    let state = newGameState({});
+    for (let i = 0; i < 7; i++) state = reduce(state, { type: 'PICK_CARD', card: ice }).state;
+    expect(state.runIdentity).toBe('id_7ice');
+    // id_7ice bonus = revive +1 → reduce 의 handlePickCard 가 ri.bonus 적용했는지 확인.
+    expect(state.reviveAvailable).toBeGreaterThan(base.reviveAvailable);
   });
 });

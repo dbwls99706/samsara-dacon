@@ -88,6 +88,7 @@ export interface RunIdentityDef {
   visual?: string;
   legendary?: boolean;
   bonus?: Effect[];
+  bonusKo?: string;
 }
 
 export interface CardsData {

@@ -400,7 +400,8 @@ function handlePickCard(state: GameState, card: Card, emit: (e: EngineEvent) => 
   if (ri && ri.id !== state.runIdentity) {
     state.runIdentity = ri.id;
     emit({ type: 'IDENTITY_FIRED', id: ri.id });
-    emit({ type: 'TEXT_BANNER', text: ri.name_ko, durationMs: 1500 });
+    // 버프가 있으면 배너에 효과 라벨 동반 → 획득 순간 보상 가시화(전설 6종).
+    emit({ type: 'TEXT_BANNER', text: ri.bonusKo ? `${ri.name_ko} — ${ri.bonusKo}` : ri.name_ko, durationMs: ri.bonusKo ? 2200 : 1500 });
     if (ri.legendary) {
       state.stats.highlightEvents.push({ t: state.elapsed, type: 'legendary', payload: { id: ri.id } });
     }
