@@ -2221,8 +2221,12 @@ export function mountSettings(host: HTMLElement, engine: Engine): () => void {
     `;
     wrap.appendChild(labelBox);
     const b = document.createElement('button');
+    // ⭐ a11y — 스크린리더가 "무엇을 켜는지" + 현재 상태 인지. role=switch + aria-checked.
+    b.setAttribute('role', 'switch');
+    b.setAttribute('aria-label', label);
     const update = () => {
       const on = !!meta[key];
+      b.setAttribute('aria-checked', String(on));
       b.innerHTML = on
         ? `<span style="display:inline-block;width:22px;height:22px;border-radius:11px;background:linear-gradient(135deg,#00ff88,#05d9e8);box-shadow:0 0 10px rgba(0,255,136,0.6)"></span>  <span style="color:#00ff88;font-weight:bold">ON</span>`
         : `<span style="display:inline-block;width:22px;height:22px;border-radius:11px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2)"></span>  <span style="color:var(--text-dim)">OFF</span>`;
