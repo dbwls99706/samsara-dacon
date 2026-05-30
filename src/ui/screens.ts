@@ -470,10 +470,30 @@ function cardEl(c: Card, onClick: () => void, ownedCards: Card[] = []): HTMLElem
         20% { opacity: 1; }
         100% { transform: translate(var(--tx), var(--ty)) scale(0.2); opacity: 0; }
       }
+      /* ⭐ 모바일 카드픽 — 데스크톱 카드는 min-height 512px 라 세로로 3장 쌓으면 한 화면에
+         1.5장만 보임(사용자 "다 안 보인다"). 좁은/낮은 화면에선 카드를 컴팩트하게 눌러
+         3장 동시 비교 가능하게. id 줄·코너장식 숨기고 폰트/패딩 축소. */
+      @media (max-width: 560px) {
+        .samsara-card {
+          min-height: 0 !important;
+          width: min(94vw, 460px) !important;
+          padding: 11px 15px !important;
+          gap: 5px !important;
+          border-radius: 13px !important;
+          animation: none !important;
+        }
+        .samsara-card .sc-id { display: none !important; }
+        .samsara-card .sc-emoji { font-size: 30px !important; }
+        .samsara-card .sc-name { font-size: 20px !important; }
+        .samsara-card .sc-effects { padding: 8px 12px !important; }
+        .samsara-card .sc-effects > div { font-size: 12px !important; line-height: 1.35 !important; padding: 4px 0 4px 10px !important; }
+        .samsara-card .sc-synergy { padding: 6px 10px !important; margin-top: 6px !important; }
+      }
     `;
     document.head.appendChild(kf);
   }
   // 반응형 — clamp 로 220~360px (좁은 화면 ~ 넓은 화면). 높이도 크게.
+  // 모바일/낮은 화면은 위 .samsara-card 미디어쿼리가 컴팩트하게 override (3장 동시 노출).
   const wrapper = el('div', `
     width:clamp(220px, 38vw, 360px);
     min-height:clamp(360px, 56vh, 520px);
@@ -486,6 +506,7 @@ function cardEl(c: Card, onClick: () => void, ownedCards: Card[] = []): HTMLElem
     box-shadow:0 4px 18px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.06);
     animation:card-pulse-border 3s ease-in-out infinite;
   `);
+  wrapper.className = 'samsara-card';
 
   // 태그 배경 글로우
   const glow = el('div', `position:absolute;inset:0;background:radial-gradient(ellipse at top, ${tagColor}66, transparent 65%);pointer-events:none`);
@@ -513,6 +534,7 @@ function cardEl(c: Card, onClick: () => void, ownedCards: Card[] = []): HTMLElem
   const effectsHTML = c.effects.map((e, i) =>
     `<div style="font-size:clamp(13px, 1.3vw, 16px);color:var(--text);line-height:1.55;padding:8px 0 8px 12px;border-left:2px solid ${tagColor};margin:${i === 0 ? '0' : '6px 0 0'};opacity:0.95">${describeEffect(e)}</div>`
   ).join('');
+  // (sc-* 클래스 = 모바일 컴팩트 미디어쿼리 타깃)
 
   // 듀얼 태그 표시
   const allTags = c.tags.map(tg => TAG_EMOJI[tg] ?? '✨').join('');
@@ -537,15 +559,15 @@ function cardEl(c: Card, onClick: () => void, ownedCards: Card[] = []): HTMLElem
   inner.style.cssText = 'position:relative;z-index:1;display:flex;flex-direction:column;gap:clamp(8px,1.2vw,14px);height:100%';
   inner.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <span style="font-size:clamp(36px, 4.5vw, 56px);line-height:1;filter:drop-shadow(0 0 8px ${tagColor})">${allTags}</span>
+      <span class="sc-emoji" style="font-size:clamp(36px, 4.5vw, 56px);line-height:1;filter:drop-shadow(0 0 8px ${tagColor})">${allTags}</span>
       <span style="font-size:clamp(11px, 1.1vw, 14px);color:${RARITY_COLOR[c.rarity]};text-transform:uppercase;letter-spacing:3px;font-weight:bold;text-shadow:0 0 8px ${RARITY_COLOR[c.rarity]}">${c.rarity}</span>
     </div>
-    <div style="text-align:center;font-size:clamp(22px, 2.6vw, 36px);font-weight:bold;color:${tagColor};letter-spacing:2px;text-shadow:0 0 14px ${tagColor},0 0 28px ${tagColor}55;line-height:1.1">${(c as any).name_ko ?? c.id}</div>
-    <div style="text-align:center;font-size:clamp(9px, 0.9vw, 11px);color:var(--text-dim);letter-spacing:3px;opacity:0.55;margin-top:-4px">${c.id}</div>
+    <div class="sc-name" style="text-align:center;font-size:clamp(22px, 2.6vw, 36px);font-weight:bold;color:${tagColor};letter-spacing:2px;text-shadow:0 0 14px ${tagColor},0 0 28px ${tagColor}55;line-height:1.1">${(c as any).name_ko ?? c.id}</div>
+    <div class="sc-id" style="text-align:center;font-size:clamp(9px, 0.9vw, 11px);color:var(--text-dim);letter-spacing:3px;opacity:0.55;margin-top:-4px">${c.id}</div>
     <div style="height:1px;background:linear-gradient(90deg, transparent, ${tagColor}, transparent);margin:0 -4px"></div>
-    <div style="background:linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.25));border-radius:10px;padding:clamp(10px, 1.5vw, 16px) clamp(12px, 1.8vw, 20px);border:1px solid rgba(255,255,255,0.05)">${effectsHTML}</div>
+    <div class="sc-effects" style="background:linear-gradient(180deg, rgba(0,0,0,0.4), rgba(0,0,0,0.25));border-radius:10px;padding:clamp(10px, 1.5vw, 16px) clamp(12px, 1.8vw, 20px);border:1px solid rgba(255,255,255,0.05)">${effectsHTML}</div>
     ${synergyHTML ? `
-      <div style="margin-top:auto;background:rgba(0,0,0,0.35);border-radius:8px;padding:clamp(8px,1.2vw,12px) clamp(10px,1.4vw,14px);border:1px dashed ${tagColor}55">
+      <div class="sc-synergy" style="margin-top:auto;background:rgba(0,0,0,0.35);border-radius:8px;padding:clamp(8px,1.2vw,12px) clamp(10px,1.4vw,14px);border:1px dashed ${tagColor}55">
         <div style="font-size:clamp(9px,0.85vw,11px);color:${tagColor};letter-spacing:3px;opacity:0.85;margin-bottom:4px;font-family:Galmuri11,monospace">★ 시너지 세트</div>
         ${synergyHTML}
       </div>
@@ -1151,8 +1173,10 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
   main.appendChild(menu);
 
   // ── 하단 정보 (일일 시드 + 버전) ──
+  // 일반 플로우로 배치 (이전 position:absolute → 복귀 플레이어의 긴 콘텐츠(도감/일일시련)
+  //  위에 떠서 겹침. 짧은 폰 412×740 에서 도감 패널과 충돌). 이제 콘텐츠 끝에 자연 정렬 + 스크롤.
   main.appendChild(el('div', `
-    position:absolute;bottom:clamp(16px, 3vh, 32px);
+    position:relative;flex-shrink:0;margin:clamp(18px,3vh,30px) 0 clamp(10px,2vh,18px);
     color:var(--text-dim);
     font-family:Galmuri11,monospace;
     font-size:clamp(11px, 1.0vw, 14px);
@@ -1583,7 +1607,7 @@ export function mountCardPick(host: HTMLElement, engine: Engine): () => void {
   // 웨이브 종료 픽: cardPick 페이즈 → 다음 웨이브 시작
   const wasLevelUp = state.phase === 'paused' && state.waveTimeRemaining > 0.5;
 
-  const cards = el('div', 'display:flex;gap:clamp(14px, 2vw, 28px);flex-wrap:wrap;justify-content:center;max-width:min(1280px, 96vw);padding:0 clamp(8px, 1.5vw, 24px)');
+  const cards = el('div', 'display:flex;gap:clamp(14px, 2vw, 28px);flex-wrap:wrap;justify-content:center;align-items:flex-start;max-width:min(1280px, 96vw);padding:0 clamp(8px, 1.5vw, 24px)');
   const ownedCards = state.cards as Card[];
   for (const c of choices) {
     cards.appendChild(cardEl(c, () => {
