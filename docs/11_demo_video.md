@@ -121,7 +121,7 @@
 DACON 미니게임 챌린지
 
 🌐 samsara-dacon.vercel.app
-💻 GitHub: samsara-dacon.vercel.app
+💻 github.com/dbwls99706/samsara-dacon
 
 (QR 코드: 모바일 시청자가 즉시 접속 가능)
 ```
@@ -135,7 +135,7 @@ DACON 미니게임 챌린지
   "10분 안에 중독시켜라 - 웹 미니게임 챌린지"
 
   🎮 플레이: https://samsara-dacon.vercel.app
-  📦 GitHub: https://github.com/[REPO]
+  📦 GitHub: https://github.com/dbwls99706/samsara-dacon
 
   30초마다 새 운명을 짠다
 
