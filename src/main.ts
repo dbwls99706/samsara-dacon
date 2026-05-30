@@ -75,6 +75,9 @@ app.innerHTML = '';
 
 // 월드 캔버스 (z-index:1) — 항상 존재
 const worldCanvas = initWorldRender(app);
+// 모바일 — 게임 캔버스 위 드래그가 브라우저 스와이프/스크롤/당겨서새로고침으로 가로채이지 않게.
+// (캔버스에만 적용 → 메뉴/카드픽 등 DOM 스크린은 정상 스크롤 유지.)
+worldCanvas.style.touchAction = 'none';
 
 // HUD 오버레이 (z-index:5, position:absolute)
 const playRoot = document.createElement('div');
@@ -185,7 +188,7 @@ playRoot.innerHTML = `
 
   <div id="hud-weapons" style="position:absolute;top:316px;right:16px;display:flex;flex-direction:column;gap:10px;font-family:Galmuri11,monospace;pointer-events:none;"></div>
 
-  <div id="pause-menu" style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(14,8,34,0.88),rgba(2,1,10,0.96));display:none;flex-direction:column;align-items:center;justify-content:center;z-index:20;font-family:Galmuri11,monospace;pointer-events:auto;backdrop-filter:blur(12px);">
+  <div id="pause-menu" style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(14,8,34,0.88),rgba(2,1,10,0.96));display:none;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;padding:24px 0;z-index:20;font-family:Galmuri11,monospace;pointer-events:auto;backdrop-filter:blur(12px);">
     <!-- 회전 인장 (배경 깊이) -->
     <div id="pause-sigil" style="position:absolute;width:480px;height:480px;border:1px solid rgba(5,217,232,0.08);border-radius:50%;animation:pause-sigil-rot 60s linear infinite;pointer-events:none;box-shadow:inset 0 0 60px rgba(5,217,232,0.05)"></div>
     <div style="position:absolute;font-family:Galmuri11,monospace;font-size:200px;color:rgba(5,217,232,0.04);font-weight:bold;letter-spacing:30px;pointer-events:none;user-select:none;text-shadow:0 0 80px rgba(5,217,232,0.1)">PAUSE</div>
@@ -206,9 +209,10 @@ playRoot.innerHTML = `
 
     <!-- ⭐ 무기 상세 — 플레이 중 HUD 는 아이콘 레일(액션 가림 X)이고, 전체 스탯/플레이버/
          시너지 힌트는 여기서 확인. showPauseMenu() 가 일시정지 시 채운다. -->
-    <div id="pause-weapons" style="position:relative;margin-top:28px;width:min(560px,86vw);display:flex;flex-wrap:wrap;gap:8px;justify-content:center;animation:pause-rise .35s ease-out .18s both;max-height:34vh;overflow-y:auto"></div>
+    <div id="pause-weapons" style="position:relative;margin-top:28px;width:min(560px,86vw);display:flex;flex-wrap:wrap;gap:8px;justify-content:center;animation:pause-rise .35s ease-out .18s both"></div>
 
-    <div style="position:absolute;bottom:32px;color:var(--text-dim);font-size:10px;letter-spacing:3px;opacity:0.6">ESC 또는 ▶ 재개 클릭</div>
+    <!-- 풋터: 일반 플로우(이전 position:absolute → 무기 다수 장착 시 무기 카드와 겹침). 컬럼 끝에 배치. -->
+    <div style="position:relative;flex-shrink:0;margin-top:24px;color:var(--text-dim);font-size:10px;letter-spacing:3px;opacity:0.6">ESC 또는 ▶ 재개 클릭</div>
   </div>
 
   <!-- ⭐ 입력 hint — 첫 사이클(meta.totalCycles === 0) W1 에서만 6초간 표시. 첫 의미있는 입력 시 즉시 페이드아웃.
@@ -2118,7 +2122,7 @@ function renderPauseWeapons() {
     const dmgHint = (w as any).damageHint as string | undefined;
     const evoHint = (w as any).evolutionHint as string | undefined;
     return `
-      <div style="display:flex;flex-direction:column;gap:6px;background:${bg};border:1px solid ${border};padding:8px 12px;border-radius:8px;width:200px;box-shadow:0 4px 10px rgba(0,0,0,0.4);">
+      <div style="display:flex;flex-direction:column;gap:6px;background:${bg};border:1px solid ${border};padding:8px 12px;border-radius:8px;width:clamp(160px,44vw,200px);box-shadow:0 4px 10px rgba(0,0,0,0.4);">
         <div style="display:flex;align-items:center;gap:10px;">
           <div style="width:34px;height:34px;flex-shrink:0;border-radius:50%;background:rgba(0,0,0,0.5);border:1px solid ${ringColor}66;display:flex;align-items:center;justify-content:center;font-size:17px;">${emoji}</div>
           <div style="flex:1;min-width:0;">
