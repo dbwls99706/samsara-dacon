@@ -639,11 +639,11 @@ function drawDecoration(d: DecoLite, sx: number, sy: number, t: number) {
       ctx.beginPath();
       ctx.ellipse(2, 22, 24, 6, 0, 0, Math.PI * 2);
       ctx.fill();
-      // 메인 바위 (큰 거 1)
+      // 메인 바위 (큰 거 1) — ⭐ 네오펑크 우주 팔레트(인디고/슬레이트)로. 지구 회색 X.
       const rg1 = ctx.createRadialGradient(-6, -8, 0, -6, -8, 24);
-      rg1.addColorStop(0, '#586878');
-      rg1.addColorStop(0.6, '#384858');
-      rg1.addColorStop(1, '#202830');
+      rg1.addColorStop(0, '#4a4468');
+      rg1.addColorStop(0.6, '#2c2742');
+      rg1.addColorStop(1, '#161222');
       ctx.fillStyle = rg1;
       ctx.beginPath();
       ctx.moveTo(-22, -2); ctx.lineTo(-14, -22); ctx.lineTo(8, -20); ctx.lineTo(20, -4); ctx.lineTo(14, 18); ctx.lineTo(-12, 16); ctx.closePath();
@@ -652,15 +652,15 @@ function drawDecoration(d: DecoLite, sx: number, sy: number, t: number) {
       ctx.lineWidth = 1.5 * invSize;
       ctx.stroke();
       // 작은 바위 2개 (옆에)
-      ctx.fillStyle = '#384858';
+      ctx.fillStyle = '#2c2742';
       ctx.beginPath();
       ctx.moveTo(14, -16); ctx.lineTo(22, -8); ctx.lineTo(20, 4); ctx.lineTo(10, 0); ctx.closePath();
       ctx.fill(); ctx.stroke();
       ctx.beginPath();
       ctx.moveTo(-18, 8); ctx.lineTo(-22, 20); ctx.lineTo(-10, 22); ctx.lineTo(-8, 12); ctx.closePath();
       ctx.fill(); ctx.stroke();
-      // 하이라이트 (광택)
-      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      // 하이라이트 (은은한 보라 림 — 네온 씬과 통합)
+      ctx.fillStyle = 'rgba(177,140,255,0.18)';
       ctx.beginPath();
       ctx.ellipse(-6, -10, 8, 4, -0.4, 0, Math.PI * 2);
       ctx.fill();
@@ -2486,7 +2486,8 @@ function drawArea(a: AreaEffect, cx: number, cy: number, W: number, H: number, t
 
 // ⭐ 픽업 색 약속 (5색 약속 정렬):
 //  - coin = 황금 / xp = 라임 / gem = 시안 / heart = 핑크 (♥로 명확히) / chest = 황금+무지개
-const PICKUP_AURA: Record<string, string> = { coin: '#ffd700', xp: '#b3ff00', gem: '#05d9e8', heart: '#ff66aa', magnet: '#b3ff00', bomb: '#ffaa00', chest: '#ffd700' };
+// ⭐ aura = 픽업 본체 색과 반드시 일치 (이전 xp 시안젬에 라임 헤일로 = 색 충돌).
+const PICKUP_AURA: Record<string, string> = { coin: '#ffd700', xp: '#05d9e8', gem: '#05d9e8', heart: '#ff66aa', magnet: '#b3ff00', bomb: '#ffaa00', chest: '#ffd700' };
 
 function drawPickup(p: Pickup, cx: number, cy: number, W: number, H: number, t: number) {
   if (!ctx) return;
@@ -2504,13 +2505,12 @@ function drawPickup(p: Pickup, cx: number, cy: number, W: number, H: number, t: 
   ctx.fill();
   ctx.restore();
 
-  // ⭐ 지면 헤일로 — 모든 픽업에 펄스 ring + 외곽 글로우 추가 (보상 인지)
+  // ⭐ 지면 헤일로 — 픽업 보상 인지. 단 배경에 녹아들도록 부드럽게(반경/알파 축소, 색 일치).
   ctx.save();
-  // 큰 외곽 펄스 글로우 (radial)
-  const haloR = p.radius * 2.4 * pulse;
+  const haloR = p.radius * 1.9 * pulse;
   const haloGrad = ctx.createRadialGradient(sx, sy, 0, sx, sy, haloR);
-  haloGrad.addColorStop(0, `${aura}66`);
-  haloGrad.addColorStop(0.5, `${aura}22`);
+  haloGrad.addColorStop(0, `${aura}40`);
+  haloGrad.addColorStop(0.5, `${aura}16`);
   haloGrad.addColorStop(1, `${aura}00`);
   ctx.fillStyle = haloGrad;
   ctx.beginPath(); ctx.arc(sx, sy, haloR, 0, Math.PI * 2); ctx.fill();
@@ -2531,7 +2531,7 @@ function drawPickup(p: Pickup, cx: number, cy: number, W: number, H: number, t: 
   const sprite = getPickupImg(p.kind);
   if (sprite) {
     ctx.save();
-    ctx.shadowBlur = 16;
+    ctx.shadowBlur = 9;
     ctx.shadowColor = aura;
     // ⭐ 시각 스케일 +50% (충돌 radius 와 별개)
     const size = p.radius * 3 * pulse;

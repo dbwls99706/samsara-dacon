@@ -247,6 +247,9 @@ const $overlay = document.getElementById('overlay')!;
 const $popups = document.getElementById('popups')!;
 const $modifier = document.getElementById('hud-modifier')!;
 const $identity = document.getElementById('hud-identity')!;
+// 카운트다운 종료 시각(ms). 이 동안 TEXT_BANNER(모디파이어 이름 등)는 중앙 3-2-1 과 겹침 방지로 보류.
+// (TDZ 가드: TEXT_BANNER 핸들러보다 먼저 선언 — feedback_subscribestate_tdz 패턴.)
+let countdownEndsAt = 0;
 const $boss = document.getElementById('hud-boss')!;
 const $bossName = document.getElementById('hud-boss-name')!;
 const $bossHpText = document.getElementById('hud-boss-hp-text')!;
@@ -376,7 +379,9 @@ function startNewWave(wave: number) {
     const choices = engine.drawCardChoices(1);
     if (choices[0]) {
       engine.dispatch({ type: 'PICK_CARD', card: choices[0] });
-      flashOverlay(`첫 카드: ${(choices[0] as any).name_ko ?? choices[0].id}`, 1500);
+      // ⭐ 첫 카드 배너는 런 시작 카운트다운(3-2-1, ~1.68s)이 끝난 뒤에 — 중앙 숫자와 겹침 방지.
+      const firstCardName = (choices[0] as any).name_ko ?? choices[0].id;
+      setTimeout(() => flashOverlay(`첫 카드: ${firstCardName}`, 1400), 1850);
     }
     // 분석 — 런 시작
     const ma = engine.getState().meta as any;
@@ -865,6 +870,13 @@ function spawnPopup(text: string, x: number, y: number, color = '#f0f0ff', size 
 }
 
 function flashOverlay(text: string, durationMs = 800) {
+  // ⭐ 카운트다운(3-2-1) 진행 중엔 중앙 오버레이(모디파이어/첫 카드 등)를 그 이후로 미룸 →
+  //   숫자와 겹쳐 난잡해지던 wave-start 를 깔끔하게 (카운트다운 먼저, 그다음 배너).
+  const now = performance.now();
+  if (now < countdownEndsAt) {
+    setTimeout(() => flashOverlay(text, durationMs), countdownEndsAt - now + 120);
+    return;
+  }
   $overlay.textContent = text;
   $overlay.style.opacity = '1';
   setTimeout(() => { $overlay.style.opacity = '0'; }, durationMs);
@@ -1550,29 +1562,29 @@ function showIdentityRitual(identityId: string) {
   setTimeout(() => host.remove(), dur + 100);
 }
 
-// 시네마틱 3-2-1-GO 카운트다운 — 단계별 색 + 펄스 링 + zoom-in/out
+// 미니멀 3-2-1-GO 카운트다운 — 숫자만(서브라벨/링/슈퍼노바 제거)
 function countdown(wave: number) {
+  countdownEndsAt = performance.now() + 420 * 4;
   if (!document.getElementById('cd-anim')) {
     const st = document.createElement('style');
     st.id = 'cd-anim';
     st.textContent = `
-      @keyframes cd-num-in { 0%{opacity:0;transform:translate(-50%,-50%) scale(2.4) rotate(-15deg);filter:blur(20px)} 30%{opacity:1;filter:blur(0)} 60%{transform:translate(-50%,-50%) scale(1) rotate(0)} 100%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1} }
-      @keyframes cd-num-out { 0%{opacity:1;transform:translate(-50%,-50%) scale(1)} 100%{opacity:0;transform:translate(-50%,-50%) scale(0.4);filter:blur(8px)} }
-      @keyframes cd-ring-pulse { 0%{transform:translate(-50%,-50%) scale(0.5);opacity:1} 100%{transform:translate(-50%,-50%) scale(2.5);opacity:0} }
-      @keyframes cd-go-flash { 0%{opacity:0;transform:translate(-50%,-50%) scale(0.5)} 30%{opacity:1;transform:translate(-50%,-50%) scale(1.15)} 60%{transform:translate(-50%,-50%) scale(1)} 100%{opacity:0;transform:translate(-50%,-50%) scale(2);filter:blur(12px)} }
+      @keyframes cd-num-in { 0%{opacity:0;transform:translate(-50%,-50%) scale(1.6)} 35%{opacity:1} 100%{transform:translate(-50%,-50%) scale(1);opacity:1} }
+      @keyframes cd-num-out { 0%{opacity:1;transform:translate(-50%,-50%) scale(1)} 100%{opacity:0;transform:translate(-50%,-50%) scale(0.7)} }
+      @keyframes cd-go-flash { 0%{opacity:0;transform:translate(-50%,-50%) scale(0.7)} 30%{opacity:1;transform:translate(-50%,-50%) scale(1.05)} 75%{opacity:1;transform:translate(-50%,-50%) scale(1)} 100%{opacity:0;transform:translate(-50%,-50%) scale(1.2)} }
     `;
     document.head.appendChild(st);
   }
 
-  // 4 단계: 3/2/1/GO. 각 단계마다 색 다름.
-  const stages: { label: string; color: string; sub: string; sfx: string }[] = [
-    { label: '3',  color: '#05d9e8', sub: 'READY',         sfx: 'sfx_combo_3' },
-    { label: '2',  color: '#ffd700', sub: 'STEADY',        sfx: 'sfx_combo_3' },
-    { label: '1',  color: '#ff2a6d', sub: 'SET',           sfx: 'sfx_combo_3' },
-    { label: 'GO', color: '#b3ff00', sub: `WAVE ${wave}`,  sfx: 'sfx_wave_start' },
+  // ⭐ 미니멀 카운트다운 — 숫자만. 서브라벨(READY/STEADY/SET)·확장 링·슈퍼노바 전부 제거(난잡 해소).
+  //    매 웨이브 1.3초만 차지. 색: 시안 → 골드 → 핑크 → (GO) 라임.
+  const stages: { label: string; color: string; sfx: string }[] = [
+    { label: '3',  color: '#05d9e8', sfx: 'sfx_combo_3' },
+    { label: '2',  color: '#ffd700', sfx: 'sfx_combo_3' },
+    { label: '1',  color: '#ff2a6d', sfx: 'sfx_combo_3' },
+    { label: 'GO', color: '#b3ff00', sfx: 'sfx_wave_start' },
   ];
 
-  // 호스트 컨테이너 — 1번만
   const old = document.getElementById('cd-host');
   if (old) old.remove();
   const host = document.createElement('div');
@@ -1581,7 +1593,7 @@ function countdown(wave: number) {
   document.body.appendChild(host);
 
   let i = 0;
-  const PER = 600;
+  const PER = 420;
   function step() {
     if (i >= stages.length) {
       setTimeout(() => host.remove(), PER);
@@ -1591,62 +1603,26 @@ function countdown(wave: number) {
     const isGo = s.label === 'GO';
     playSfx(s.sfx);
 
-    // 메인 한자/라벨
     const main = document.createElement('div');
     main.style.cssText = `
       position:absolute;left:50%;top:50%;
       font-family:Galmuri11,monospace;
-      font-size:${isGo ? 'clamp(80px,10vw,140px)' : 'clamp(160px,18vw,260px)'};
+      font-size:${isGo ? 'clamp(56px,8vw,104px)' : 'clamp(88px,12vw,168px)'};
       color:${s.color};
-      font-weight:bold;letter-spacing:${isGo ? '12px' : '0'};
-      text-shadow:0 0 32px ${s.color},0 0 64px ${s.color}aa,0 6px 0 rgba(0,0,0,0.5);
+      font-weight:bold;letter-spacing:${isGo ? '10px' : '0'};
+      text-shadow:0 0 18px ${s.color},0 4px 0 rgba(0,0,0,0.45);
+      opacity:0.92;
       animation:${isGo ? 'cd-go-flash' : 'cd-num-in'} ${isGo ? PER : PER * 0.7}ms cubic-bezier(.16,1,.3,1) both;
-      will-change:transform,opacity,filter;
+      will-change:transform,opacity;
     `;
     main.textContent = s.label;
     host.appendChild(main);
 
-    // 서브 텍스트 (작게, 아래)
-    const sub = document.createElement('div');
-    sub.style.cssText = `
-      position:absolute;left:50%;top:calc(50% + ${isGo ? '90px' : '140px'});
-      transform:translateX(-50%);
-      font-family:Galmuri11,monospace;
-      font-size:14px;color:${s.color};opacity:0.7;
-      letter-spacing:6px;
-      text-shadow:0 0 8px ${s.color};
-    `;
-    sub.textContent = s.sub;
-    host.appendChild(sub);
-
-    // 펄스 링 (단계마다 색 다름)
-    const ring = document.createElement('div');
-    ring.style.cssText = `
-      position:absolute;left:50%;top:50%;
-      width:200px;height:200px;border:3px solid ${s.color};border-radius:50%;
-      box-shadow:0 0 20px ${s.color},inset 0 0 20px ${s.color}88;
-      animation:cd-ring-pulse ${PER * 0.8}ms ease-out forwards;
-      will-change:transform,opacity;
-    `;
-    host.appendChild(ring);
-
-    // GO 단계는 추가 폭발 (16 spark)
-    if (isGo) {
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight / 2;
-      spawnParticles('supernova', cx, cy, 24);
-    }
-
-    // 다음 단계 전에 페이드아웃
     setTimeout(() => {
       if (!isGo) main.style.animation = `cd-num-out ${PER * 0.3}ms ease-in forwards`;
-      sub.style.transition = 'opacity .2s';
-      sub.style.opacity = '0';
     }, PER * 0.7);
 
-    setTimeout(() => {
-      try { main.remove(); sub.remove(); ring.remove(); } catch {}
-    }, PER);
+    setTimeout(() => { try { main.remove(); } catch {} }, PER);
 
     i++;
     setTimeout(step, PER);
