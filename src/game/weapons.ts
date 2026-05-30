@@ -353,7 +353,7 @@ function makeFire(level: number, s3: boolean, s5: boolean, s7: boolean): Weapon 
         spawnAttackFx({ kind: 'flash', pos: { ...w.player.pos }, angle: 0, range: radius * 0.55, color: '#ffaa00', duration: 0.3, thickness: 0 });
       }
       // 7장 Phoenix — 5초 쿨다운 (이전: 매 발동 → OP). dps 1.5x → 1.0x
-      if (s7 && t >= (w as any)._fire7Ready) {
+      if (s7 && t >= ((w as any)._fire7Ready ?? 0)) {
         (w as any)._fire7Ready = t + 5000;
         for (let i = 0; i < 8; i++) {
           const a = (i / 8) * Math.PI * 2;
@@ -470,7 +470,7 @@ function makeGold(level: number, s3: boolean, s5: boolean, s7: boolean): Weapon 
         });
       }
       // King Midas — 코인 소나기 (4초 쿨다운, 5발)
-      if (s7 && t >= (w as any)._gold7Ready) {
+      if (s7 && t >= ((w as any)._gold7Ready ?? 0)) {
         (w as any)._gold7Ready = t + 4000;
         for (let i = 0; i < 5; i++) {
           const a = rng() * Math.PI * 2;
@@ -521,7 +521,7 @@ function makeTime(level: number, s3: boolean, s5: boolean, s7: boolean): Weapon 
         hitInterval: 0.5,
       });
       // 시간 동결 0.4초 — 5초 쿨다운
-      if (s7 && t >= (w as any)._time7Ready) {
+      if (s7 && t >= ((w as any)._time7Ready ?? 0)) {
         (w as any)._time7Ready = t + 5000;
         for (const e of w.enemies) e.slowUntil = Math.max(e.slowUntil, t + 400);
       }
@@ -563,7 +563,7 @@ function makeChaos(level: number, s3: boolean, s5: boolean, s7: boolean): Weapon
         });
       }
       // 7장 — 카오스 구체 8발 추가 (5초 쿨다운)
-      if (s7 && t >= (w as any)._chaos7Ready) {
+      if (s7 && t >= ((w as any)._chaos7Ready ?? 0)) {
         (w as any)._chaos7Ready = t + 5000;
         for (let i = 0; i < 8; i++) {
           const a = (i / 8) * Math.PI * 2;
