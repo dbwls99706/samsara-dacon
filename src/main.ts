@@ -1954,7 +1954,10 @@ function gameLoopBody(t: number) {
   }
 
   // 레벨업 — 카드 선택 (게임 일시정지). 한자 도장 박스 제거 (사용자 피드백) → 모달 자체가 임팩트 담당
-  if (world.pendingLevelUps > 0 && getScreen() === 'play' && (s.phase === 'playing' || s.phase === 'boss')) {
+  // ⭐ 카운트다운(3-2-1) 중에는 보류 — 웨이브 마지막에 누적된 레벨업이 다음 웨이브 카운트다운과
+  //   겹쳐 "카드픽+3-2-1 동시" + "두 번 픽" 으로 보이던 버그. 카운트다운 종료 후 깔끔히 순차 표시.
+  if (world.pendingLevelUps > 0 && getScreen() === 'play' && (s.phase === 'playing' || s.phase === 'boss')
+      && performance.now() >= countdownEndsAt) {
     world.pendingLevelUps -= 1;
     playLevelUpFanfare();
     haptic('synergy');

@@ -476,18 +476,19 @@ function cardEl(c: Card, onClick: () => void, ownedCards: Card[] = []): HTMLElem
       @media (max-width: 560px) {
         .samsara-card {
           min-height: 0 !important;
-          width: min(94vw, 460px) !important;
-          padding: 11px 15px !important;
-          gap: 5px !important;
-          border-radius: 13px !important;
+          width: min(90vw, 400px) !important;
+          padding: 9px 13px !important;
+          gap: 3px !important;
+          border-radius: 12px !important;
           animation: none !important;
         }
         .samsara-card .sc-id { display: none !important; }
-        .samsara-card .sc-emoji { font-size: 30px !important; }
-        .samsara-card .sc-name { font-size: 20px !important; }
-        .samsara-card .sc-effects { padding: 8px 12px !important; }
-        .samsara-card .sc-effects > div { font-size: 12px !important; line-height: 1.35 !important; padding: 4px 0 4px 10px !important; }
-        .samsara-card .sc-synergy { padding: 6px 10px !important; margin-top: 6px !important; }
+        .samsara-card .sc-emoji { font-size: 23px !important; }
+        .samsara-card .sc-name { font-size: 16px !important; }
+        .samsara-card .sc-effects { padding: 6px 10px !important; }
+        .samsara-card .sc-effects > div { font-size: 11px !important; line-height: 1.3 !important; padding: 3px 0 3px 9px !important; }
+        .samsara-card .sc-synergy { padding: 5px 9px !important; margin-top: 4px !important; }
+        .samsara-card .sc-synergy > div { font-size: 9.5px !important; }
       }
     `;
     document.head.appendChild(kf);
