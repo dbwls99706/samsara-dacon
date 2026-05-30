@@ -65,7 +65,7 @@ function showRecoveryScreen(err: Error): void {
     position:fixed;inset:0;background:rgba(10,10,26,0.95);z-index:9999;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     font-family:Galmuri11,monospace;color:#f0f0ff;padding:24px;text-align:center;
-    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
   `;
   overlay.innerHTML = `
     <div style="font-size:64px;color:#ff2a6d;margin-bottom:8px">⚠</div>

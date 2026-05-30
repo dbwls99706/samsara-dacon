@@ -99,7 +99,7 @@ playRoot.innerHTML = `
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 8px;
       padding: 8px 14px;
-      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
       -webkit-backdrop-filter: blur(8px);
       box-shadow: 0 4px 14px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.04);
     }
@@ -115,6 +115,16 @@ playRoot.innerHTML = `
     body.samsara-show-fps #hud-fps-frame { display: block !important; }
     @keyframes hud-fadein { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes input-hint-pulse { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
+    /* ⭐ 가로/짧은 화면(landscape 폰 등) — 세로 무기 레일(top:316px column)이 390px 높이를
+       넘어 잘리던 것(호환성 감사 P1) 해소. 미니맵 축소·상향 + 레일을 가로 wrap 행으로. */
+    @media (max-height: 500px) {
+      #hud-minimap { top: 80px !important; width: 100px !important; height: 100px !important; }
+      #hud-weapons {
+        top: 188px !important;
+        flex-direction: row !important; flex-wrap: wrap !important;
+        max-width: 228px !important; justify-content: flex-end !important; gap: 6px !important;
+      }
+    }
   </style>
   <div id="hud-top" style="position:absolute;top:env(safe-area-inset-top,0);left:0;right:0;padding:12px clamp(10px,3vw,20px);display:flex;justify-content:space-between;align-items:flex-start;font-family:Galmuri11,monospace;text-shadow:0 0 8px rgba(0,0,0,0.9);pointer-events:none;gap:clamp(6px,2vw,14px);">
     <div class="hud-frame" style="border-color:rgba(255,215,0,0.3);padding:7px clamp(10px,2.2vw,16px);flex:0 1 auto;min-width:0">
@@ -137,11 +147,11 @@ playRoot.innerHTML = `
 
   <!-- 모디파이어 / Run Identity 콜아웃 — 상단 3칩에서 분리해 중앙 하단 배너로. 칩 폭을 절대 밀지 않음. -->
   <div id="hud-callout" style="position:absolute;top:calc(env(safe-area-inset-top,0) + 108px);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px;font-family:Galmuri11,monospace;pointer-events:none;text-align:center;max-width:74vw;z-index:8">
-    <div id="hud-modifier" style="font-size:11px;color:#ffc2f3;letter-spacing:1.5px;font-weight:bold;text-shadow:0 0 6px rgba(211,0,197,0.9);display:none;background:rgba(24,8,38,0.9);border:1px solid rgba(255,90,230,0.55);border-radius:12px;padding:4px 13px;backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,0.5)"></div>
-    <div id="hud-identity" style="font-size:12px;color:#ffe680;letter-spacing:1px;font-weight:bold;text-shadow:0 0 8px rgba(255,215,0,0.9);display:none;background:rgba(32,22,4,0.9);border:1px solid rgba(255,215,0,0.55);border-radius:12px;padding:4px 14px;backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,0.5)"></div>
+    <div id="hud-modifier" style="font-size:11px;color:#ffc2f3;letter-spacing:1.5px;font-weight:bold;text-shadow:0 0 6px rgba(211,0,197,0.9);display:none;background:rgba(24,8,38,0.9);border:1px solid rgba(255,90,230,0.55);border-radius:12px;padding:4px 13px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,0.5)"></div>
+    <div id="hud-identity" style="font-size:12px;color:#ffe680;letter-spacing:1px;font-weight:bold;text-shadow:0 0 8px rgba(255,215,0,0.9);display:none;background:rgba(32,22,4,0.9);border:1px solid rgba(255,215,0,0.55);border-radius:12px;padding:4px 14px;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,0.5)"></div>
   </div>
 
-  <div id="hud-boss" style="position:absolute;top:128px;left:50%;transform:translateX(-50%);min-width:340px;max-width:90vw;padding:10px 18px;background:linear-gradient(135deg,rgba(255,42,109,.55),rgba(177,74,255,.4));border:2px solid var(--fire);display:none;font-family:Galmuri11,monospace;color:#fff;border-radius:10px;animation:hud-boss-pulse 1.2s ease-in-out infinite;backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(255,42,109,0.4);">
+  <div id="hud-boss" style="position:absolute;top:128px;left:50%;transform:translateX(-50%);min-width:340px;max-width:90vw;padding:10px 18px;background:linear-gradient(135deg,rgba(255,42,109,.55),rgba(177,74,255,.4));border:2px solid var(--fire);display:none;font-family:Galmuri11,monospace;color:#fff;border-radius:10px;animation:hud-boss-pulse 1.2s ease-in-out infinite;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(255,42,109,0.4);">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px">
       <span id="hud-boss-name" style="font-size:13px;font-weight:bold;letter-spacing:3px;text-shadow:0 0 8px rgba(255,42,109,0.8)">BOSS</span>
       <span id="hud-boss-hp-text" style="font-size:11px;color:rgba(255,255,255,0.85);letter-spacing:1.5px"></span>
@@ -184,11 +194,11 @@ playRoot.innerHTML = `
     <div id="hud-fps-frame" class="hud-frame" style="padding:9px 16px;border-color:rgba(255,255,255,0.14);font-size:14px;letter-spacing:1.5px;display:none">FPS <span id="hud-fps" style="color:var(--ice);font-weight:bold">60</span></div>
   </div>
 
-  <canvas id="hud-minimap" width="220" height="220" style="position:absolute;top:128px;right:16px;width:176px;height:176px;background:linear-gradient(135deg,rgba(0,0,8,0.85),rgba(10,5,28,0.85));border:2px solid rgba(5,217,232,0.6);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.7),0 0 18px rgba(5,217,232,0.3),inset 0 0 14px rgba(5,217,232,0.18);backdrop-filter:blur(8px);"></canvas>
+  <canvas id="hud-minimap" width="220" height="220" style="position:absolute;top:128px;right:16px;width:176px;height:176px;background:linear-gradient(135deg,rgba(0,0,8,0.85),rgba(10,5,28,0.85));border:2px solid rgba(5,217,232,0.6);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.7),0 0 18px rgba(5,217,232,0.3),inset 0 0 14px rgba(5,217,232,0.18);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);"></canvas>
 
   <div id="hud-weapons" style="position:absolute;top:316px;right:16px;display:flex;flex-direction:column;gap:10px;font-family:Galmuri11,monospace;pointer-events:none;"></div>
 
-  <div id="pause-menu" style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(14,8,34,0.88),rgba(2,1,10,0.96));display:none;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;padding:24px 0;z-index:20;font-family:Galmuri11,monospace;pointer-events:auto;backdrop-filter:blur(12px);">
+  <div id="pause-menu" style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(14,8,34,0.88),rgba(2,1,10,0.96));display:none;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;padding:24px 0;z-index:20;font-family:Galmuri11,monospace;pointer-events:auto;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);">
     <!-- 회전 인장 (배경 깊이) -->
     <div id="pause-sigil" style="position:absolute;width:480px;height:480px;border:1px solid rgba(5,217,232,0.08);border-radius:50%;animation:pause-sigil-rot 60s linear infinite;pointer-events:none;box-shadow:inset 0 0 60px rgba(5,217,232,0.05)"></div>
     <div style="position:absolute;font-family:Galmuri11,monospace;font-size:200px;color:rgba(5,217,232,0.04);font-weight:bold;letter-spacing:30px;pointer-events:none;user-select:none;text-shadow:0 0 80px rgba(5,217,232,0.1)">PAUSE</div>
@@ -202,9 +212,9 @@ playRoot.innerHTML = `
 
     <div style="position:relative;display:flex;flex-direction:column;gap:12px;width:280px;animation:pause-rise .35s ease-out .1s both">
       <button id="pause-resume" data-pb style="position:relative;background:linear-gradient(135deg,#ff2a6d 0%,#b14aff 50%,#05d9e8 100%);color:#fff;border:none;padding:16px;border-radius:10px;font-family:Galmuri11,monospace;font-size:16px;font-weight:bold;letter-spacing:4px;cursor:pointer;box-shadow:0 6px 24px rgba(255,42,109,0.5),inset 0 0 0 1px rgba(255,255,255,0.1);transition:transform .15s,box-shadow .15s;overflow:hidden">▶  재개  <span style="opacity:0.7;font-size:0.8em">(ESC)</span></button>
-      <button id="pause-restart" data-pb style="background:rgba(26,20,46,0.7);color:var(--text);border:1px solid rgba(255,255,255,0.18);padding:14px;border-radius:8px;font-family:Galmuri11,monospace;font-size:13px;letter-spacing:3px;cursor:pointer;backdrop-filter:blur(8px);transition:background .15s,border-color .15s,transform .15s">↺  다시 시작</button>
-      <button id="pause-settings" data-pb style="background:rgba(26,20,46,0.7);color:var(--text);border:1px solid rgba(255,255,255,0.18);padding:14px;border-radius:8px;font-family:Galmuri11,monospace;font-size:13px;letter-spacing:3px;cursor:pointer;backdrop-filter:blur(8px);transition:background .15s,border-color .15s,transform .15s">⚙  설정</button>
-      <button id="pause-home" data-pb style="background:rgba(26,20,46,0.7);color:var(--text);border:1px solid rgba(255,255,255,0.18);padding:14px;border-radius:8px;font-family:Galmuri11,monospace;font-size:13px;letter-spacing:3px;cursor:pointer;backdrop-filter:blur(8px);transition:background .15s,border-color .15s,transform .15s">⌂  메인으로</button>
+      <button id="pause-restart" data-pb style="background:rgba(26,20,46,0.7);color:var(--text);border:1px solid rgba(255,255,255,0.18);padding:14px;border-radius:8px;font-family:Galmuri11,monospace;font-size:13px;letter-spacing:3px;cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:background .15s,border-color .15s,transform .15s">↺  다시 시작</button>
+      <button id="pause-settings" data-pb style="background:rgba(26,20,46,0.7);color:var(--text);border:1px solid rgba(255,255,255,0.18);padding:14px;border-radius:8px;font-family:Galmuri11,monospace;font-size:13px;letter-spacing:3px;cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:background .15s,border-color .15s,transform .15s">⚙  설정</button>
+      <button id="pause-home" data-pb style="background:rgba(26,20,46,0.7);color:var(--text);border:1px solid rgba(255,255,255,0.18);padding:14px;border-radius:8px;font-family:Galmuri11,monospace;font-size:13px;letter-spacing:3px;cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:background .15s,border-color .15s,transform .15s">⌂  메인으로</button>
     </div>
 
     <!-- ⭐ 무기 상세 — 플레이 중 HUD 는 아이콘 레일(액션 가림 X)이고, 전체 스탯/플레이버/
@@ -217,7 +227,7 @@ playRoot.innerHTML = `
 
   <!-- ⭐ 입력 hint — 첫 사이클(meta.totalCycles === 0) W1 에서만 6초간 표시. 첫 의미있는 입력 시 즉시 페이드아웃.
        정체성 P4 "읽지 않아도 알 수 있다" 가드 — 4 axis audit 에서 W1 13초 사망 위험 식별됨. -->
-  <div id="hud-input-hint" style="position:absolute;bottom:130px;left:50%;transform:translateX(-50%) translateY(8px);font-family:Galmuri11,monospace;font-size:12px;letter-spacing:2.5px;color:#fff;background:linear-gradient(135deg,rgba(255,42,109,0.18),rgba(5,217,232,0.22));border:1px solid rgba(5,217,232,0.55);border-radius:18px;padding:9px 22px;pointer-events:none;opacity:0;transition:opacity .45s ease-out,transform .45s ease-out;white-space:nowrap;text-shadow:0 0 8px rgba(0,0,0,0.9);z-index:9;box-shadow:0 4px 16px rgba(0,0,0,0.4),0 0 14px rgba(5,217,232,0.22);backdrop-filter:blur(6px);display:none;font-weight:bold;"></div>
+  <div id="hud-input-hint" style="position:absolute;bottom:130px;left:50%;transform:translateX(-50%) translateY(8px);font-family:Galmuri11,monospace;font-size:12px;letter-spacing:2.5px;color:#fff;background:linear-gradient(135deg,rgba(255,42,109,0.18),rgba(5,217,232,0.22));border:1px solid rgba(5,217,232,0.55);border-radius:18px;padding:9px 22px;pointer-events:none;opacity:0;transition:opacity .45s ease-out,transform .45s ease-out;white-space:nowrap;text-shadow:0 0 8px rgba(0,0,0,0.9);z-index:9;box-shadow:0 4px 16px rgba(0,0,0,0.4),0 0 14px rgba(5,217,232,0.22);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:none;font-weight:bold;"></div>
   <div id="overlay" style="position:absolute;top:30%;left:50%;transform:translateX(-50%);font-family:Galmuri11,monospace;color:var(--gold);font-size:44px;opacity:0;pointer-events:none;transition:opacity .3s;text-shadow:0 0 15px var(--gold),0 0 30px var(--gold),0 4px 0 rgba(0,0,0,0.6);text-align:center;letter-spacing:3px;font-weight:bold;"></div>
   <div id="popups" style="position:absolute;inset:0;pointer-events:none;"></div>
   <div id="vignette" style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center, transparent 35%, rgba(255,42,109,0.7) 100%);opacity:0;transition:opacity .15s;"></div>
@@ -301,6 +311,17 @@ document.getElementById('pause-home')!.onclick = () => { $pauseMenu.style.displa
 
 // 입력 초기화
 initInput(app);
+
+// ⭐ iOS Safari 오디오 언락 — resume() 는 사용자 제스처 콜스택 안에서 동기 실행돼야 한다.
+// 기존엔 go('play') → 라우터 구독 경로에서만 unlockAudio() 호출 → 라우팅 동기성 미보장 시
+// iOS 에서 영구 무음 위험(호환성 감사 P0). 첫 입력(어디든)에 즉시 동기 언락하는 전역 리스너로
+// 가장 견고하게 보장. unlockAudio 는 멱등(이후 line 466 startBgm 경로와 충돌 없음).
+{
+  const _unlock = () => unlockAudio();
+  for (const ev of ['pointerdown', 'touchend', 'mousedown', 'keydown'] as const) {
+    window.addEventListener(ev, _unlock, { capture: true, once: true });
+  }
+}
 
 // ─────────────────────────── 월드 ───────────────────────────
 
@@ -1168,7 +1189,7 @@ function showLevelUpModal(level: number, onContinue: () => void) {
     position:fixed;inset:0;display:flex;flex-direction:column;
     align-items:center;justify-content:center;z-index:25;pointer-events:auto;
     background:radial-gradient(ellipse at center, rgba(179,255,0,0.22) 0%, rgba(10,10,26,0.88) 70%);
-    backdrop-filter:blur(6px);font-family:Galmuri11,monospace;
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);font-family:Galmuri11,monospace;
     animation:lu-fade-in .2s ease-out;overflow:hidden;
   `;
 
@@ -1683,7 +1704,7 @@ function showBiomeCue(biome: string) {
     position:fixed;top:96px;left:50%;transform:translateX(-50%);z-index:14;
     pointer-events:none;display:flex;align-items:center;gap:8px;
     background:rgba(10,10,26,0.62);border:1px solid ${col}55;border-left:3px solid ${col};
-    border-radius:999px;padding:6px 16px 6px 12px;backdrop-filter:blur(6px);
+    border-radius:999px;padding:6px 16px 6px 12px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
     font-family:Galmuri11,monospace;letter-spacing:2px;font-size:13px;
     opacity:0;transition:opacity .3s ease;box-shadow:0 2px 14px ${col}33;
   `;
@@ -2082,11 +2103,11 @@ function renderWeaponHud() {
       const name = (w as any).displayName ?? (w.id.startsWith('starter_') ? 'STARTER' : w.tag.toUpperCase());
       // 교육 라벨 — 아이콘 왼쪽(레일이 우측 정렬이므로 왼쪽으로 자란다). 이름만, 짧게.
       const label = teach
-        ? `<div style="font-size:11px;color:${evolved ? '#ffd700' : ringColor};font-weight:bold;letter-spacing:0.5px;background:rgba(10,10,26,0.78);border:1px solid ${ringColor}55;border-radius:9px;padding:4px 9px;white-space:nowrap;text-shadow:0 0 6px rgba(0,0,0,0.9);box-shadow:0 2px 8px rgba(0,0,0,0.4);backdrop-filter:blur(4px);">${name}</div>`
+        ? `<div style="font-size:11px;color:${evolved ? '#ffd700' : ringColor};font-weight:bold;letter-spacing:0.5px;background:rgba(10,10,26,0.78);border:1px solid ${ringColor}55;border-radius:9px;padding:4px 9px;white-space:nowrap;text-shadow:0 0 6px rgba(0,0,0,0.9);box-shadow:0 2px 8px rgba(0,0,0,0.4);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);">${name}</div>`
         : '';
       // title = 데스크톱 hover 시 이름/레벨 확인 (시각 클러터 0, 접근성 보조)
       const circle = `
-        <div data-wpn-idx="${idx}" title="${name} · Lv.${w.level} · ${w.cooldownMax.toFixed(1)}s" style="position:relative;width:46px;height:46px;flex-shrink:0;border-radius:50%;background:rgba(10,10,26,0.6);border:1px solid ${border};box-shadow:${shadow};backdrop-filter:blur(6px);">
+        <div data-wpn-idx="${idx}" title="${name} · Lv.${w.level} · ${w.cooldownMax.toFixed(1)}s" style="position:relative;width:46px;height:46px;flex-shrink:0;border-radius:50%;background:rgba(10,10,26,0.6);border:1px solid ${border};box-shadow:${shadow};-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);">
           <div data-cd-wrap="${idx}" data-ring="${ringColor}" style="position:absolute;inset:3px;border-radius:50%;">
             <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);border-radius:50%;border:1px solid rgba(255,255,255,0.1);"></div>
             <div data-cd-fill="${idx}" style="position:absolute;inset:0;background:conic-gradient(${ringColor} 0%,transparent 0);border-radius:50%;mask:radial-gradient(circle, transparent 56%, black 58%);-webkit-mask:radial-gradient(circle, transparent 56%, black 58%);filter:drop-shadow(0 0 4px ${ringColor}88);"></div>

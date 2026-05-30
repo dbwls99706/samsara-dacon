@@ -66,11 +66,23 @@ export function setSfxVolume(v: number): void {
   if (masterGain) masterGain.gain.value = Math.max(0, Math.min(1, v));
 }
 
-/** 일부 브라우저는 사용자 입력 후에만 오디오 재생 가능. 첫 사용자 입력 시 호출. */
+/** 일부 브라우저는 사용자 입력 후에만 오디오 재생 가능. 첫 사용자 입력 시(제스처 콜스택 내) 호출. */
 export function unlockAudio(): void {
-  _audioUnlocked = true;
   const ctx = audioCtx();
+  // resume 은 매 호출 멱등 — iOS 는 제스처 안에서 resume() 해야 suspended 해제됨.
   if (ctx.state === 'suspended') void ctx.resume();
+  if (!_audioUnlocked) {
+    _audioUnlocked = true;
+    // ⭐ iOS Safari 완전 언락 — 제스처 내 무음 버퍼 1회 재생(고전 패턴). resume() 만으론
+    //   일부 iOS 버전이 suspended 로 되돌아가 무음. 무음 버퍼 start 로 확실히 깨운다.
+    try {
+      const buf = ctx.createBuffer(1, 1, 22050);
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.connect(ctx.destination);
+      src.start(0);
+    } catch { /* createBuffer 미지원 등 — resume() 만으로 폴백 */ }
+  }
 }
 
 /** SFX 재생 — 첫 호출 시 합성 + 캐시. */

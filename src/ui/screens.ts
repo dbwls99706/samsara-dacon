@@ -115,7 +115,7 @@ function cosmicBackButton(onClick: () => void = () => go('home'), label: string 
     min-height:44px;
     font-family:Galmuri11,monospace;font-size:13px;
     letter-spacing:2px;cursor:pointer;
-    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
     transition:background .15s, border-color .15s, transform .15s;
     z-index:30;
   `;
@@ -879,7 +879,7 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
       padding:clamp(8px, 1.2vw, 14px) clamp(14px, 2vw, 22px);
       text-align:center;
       min-width:96px;
-      backdrop-filter:blur(6px);
+      -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
       box-shadow:0 0 20px ${color}22;
     `);
     card.innerHTML = `
@@ -904,7 +904,7 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
       margin:0 0 14px;
       text-align:center;
       animation:panel-rise .8s ease-out .67s both;
-      backdrop-filter:blur(6px);
+      -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
     `);
     welcome.innerHTML = `
       <div style="font-family:Galmuri11,monospace;font-size:11px;color:rgba(255,42,109,0.95);letter-spacing:3px;margin-bottom:4px;font-weight:bold">✦ 첫 윤회의 문 ✦</div>
@@ -938,7 +938,7 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
       margin:0 0 12px;
       box-shadow:0 0 16px rgba(255,215,0,0.15);
       animation:panel-rise .8s ease-out .68s both;
-      backdrop-filter:blur(6px);
+      -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
     `);
     rpBar.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;font-family:Galmuri11,monospace;font-size:11px;color:rgba(255,215,0,0.7);letter-spacing:2px;margin-bottom:6px">
@@ -983,7 +983,7 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
       margin:0 0 12px;
       box-shadow:0 0 22px rgba(255,111,0,0.18);
       animation:panel-rise .8s ease-out .69s both;
-      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
     `);
     const seedNum = dailySeed();
     let modsHtml = '';
@@ -1034,7 +1034,7 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
         max-width:min(420px, 88vw);
         box-shadow:0 0 20px ${col}33;
         animation:panel-rise .8s ease-out .7s both;
-        backdrop-filter:blur(6px);
+        -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
       `);
       legacy.innerHTML = `
         <span style="font-size:24px;filter:drop-shadow(0 0 6px ${col})">${(TAG_EMOJI[tg] ?? '✨')}</span>
@@ -1077,7 +1077,7 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
       border-radius:10px;padding:10px 18px;margin:0 0 4px;
       font-family:Galmuri11,monospace;font-size:13px;letter-spacing:1.5px;color:#ffd700;
       animation:firstplay-glow 2.4s ease-in-out infinite;
-      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
     `);
     firstHint.innerHTML = `
       <span style="font-size:18px;filter:drop-shadow(0 0 4px #ffd700)">✦</span>
@@ -1161,7 +1161,7 @@ export function mountHome(host: HTMLElement, engine: Engine): () => void {
       font-size:clamp(13px, 1.2vw, 17px);
       cursor:pointer;
       transition:background .15s, border .15s;
-      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
       display:flex;align-items:center;gap:8px;justify-content:center;
     `;
     b.innerHTML = `<span style="font-size:1.3em">${icon}</span> <span>${label}</span>`;
@@ -1484,7 +1484,7 @@ export function mountTutorial(host: HTMLElement, _engine: Engine): () => void {
       font-family:Galmuri11,monospace;
       font-size:16px;letter-spacing:2px;
       cursor:pointer;
-      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
       transition:background .15s, border-color .15s;
     `;
     b.textContent = label;
@@ -1591,7 +1591,7 @@ export function mountCardPick(host: HTMLElement, engine: Engine): () => void {
     padding:clamp(16px,3vh,32px) clamp(12px,2vw,24px);
     overflow-y:auto;overflow-x:hidden;
     -webkit-overflow-scrolling:touch;
-    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
   `);
 
   // 우주 픽셀 헤더 — 압축
@@ -1669,7 +1669,7 @@ export function mountCardPick(host: HTMLElement, engine: Engine): () => void {
     padding:11px 22px;border-radius:8px;
     font-family:Galmuri11,monospace;font-size:13px;letter-spacing:2px;
     cursor:pointer;
-    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
     transition:background .15s, color .15s, border-color .15s;
   `;
   skipBtn.onmouseenter = () => { skipBtn.style.background = 'rgba(46,32,76,0.85)'; skipBtn.style.color = 'var(--text)'; skipBtn.style.borderColor = 'rgba(255,255,255,0.3)'; };
@@ -1900,7 +1900,7 @@ export function mountMetaShop(host: HTMLElement, engine: Engine): () => void {
     text-align:center;
     box-shadow:0 0 28px rgba(255,215,0,0.2), inset 0 0 0 1px rgba(255,255,255,0.04);
     animation:mn-fade-up .7s ease-out .15s both, mn-glow-pulse 4s ease-in-out infinite;
-    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
   `);
   rpPanel.innerHTML = `
     <div style="color:rgba(255,215,0,0.7);font-family:Galmuri11,monospace;font-size:11px;letter-spacing:4px;margin-bottom:6px">보유 윤회 점수</div>
@@ -2038,7 +2038,7 @@ export function mountLeaderboard(host: HTMLElement, engine: Engine): () => void 
     text-align:center;
     box-shadow:0 0 24px rgba(255,215,0,0.15);
     animation:mn-fade-up .7s ease-out .15s both;
-    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
   `);
   myBox.innerHTML = `
     <div style="font-family:Galmuri11,monospace;color:rgba(255,215,0,0.7);font-size:10px;letter-spacing:3px;margin-bottom:4px">★ 내 최고 점수</div>
@@ -3073,7 +3073,7 @@ export function mountHighlight(host: HTMLElement, engine: Engine): () => void {
       border:1px solid ${st.color}55;
       border-radius:10px;padding:clamp(10px,1.5vw,14px) clamp(8px,1.2vw,12px);
       text-align:center;
-      backdrop-filter:blur(6px);
+      -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
       box-shadow:0 0 16px ${st.color}22, inset 0 0 0 1px rgba(255,255,255,0.04);
       transition:transform .15s, box-shadow .15s;
     `);
@@ -3222,7 +3222,7 @@ export function mountHighlight(host: HTMLElement, engine: Engine): () => void {
     border-radius:10px;padding:clamp(12px,1.8vw,18px);
     margin-bottom:clamp(12px,1.8vh,16px);
     animation:hl-fade-up .8s ease-out 1s both;
-    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
   `);
   lbPanel.appendChild(el('div', `
     color:rgba(5,217,232,0.85);font-family:Galmuri11,monospace;
@@ -3326,7 +3326,7 @@ export function mountHighlight(host: HTMLElement, engine: Engine): () => void {
       padding:12px;border-radius:8px;
       font-family:Galmuri11,monospace;font-size:clamp(12px,1.1vw,14px);
       letter-spacing:1.5px;cursor:pointer;
-      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
       transition:background .15s, border-color .15s, transform .15s;
     `;
     b.onmouseenter = () => { b.style.background = 'rgba(46,32,76,0.85)'; b.style.borderColor = 'rgba(5,217,232,0.5)'; b.style.transform = 'translateY(-1px)'; };
