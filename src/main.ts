@@ -1755,8 +1755,13 @@ function gameLoopBody(t: number) {
   lastT = t;
   const s = engine.getState();
 
-  // 월드 시뮬은 play / boss 페이즈에서만
-  if (s.phase === 'playing' || s.phase === 'boss') {
+  // 월드 시뮬은 play / boss 페이즈에서만.
+  // ⭐ 단, 미해결 레벨업(카드픽 대기)이 남아있으면 월드 정지. PICK_CARD 가 phase 를 즉시 'playing'
+  //   으로 되돌리는데, 레벨업이 여러 개 큐된 경우 카드 1장을 고른 뒤 다음 모달이 뜨기까지의 프레임
+  //   갭(웨이브 카운트다운 중이면 최대 1.7s) 동안 적이 움직여 "카드 안 골랐는데 게임 재개 → 무방비
+  //   피격/사망" 하던 버그. pendingLevelUps==0 + 모달 없음 까지 월드 동결.
+  const cardPickPending = world.pendingLevelUps > 0 || !!document.getElementById('levelup-modal');
+  if ((s.phase === 'playing' || s.phase === 'boss') && !cardPickPending) {
     const input = readInput();
     // ⭐ 입력 hint hide — 첫 의미있는 이동(키 또는 드래그) 즉시 페이드아웃.
     if (_inputHintActive && input.active) hideInputHint();
