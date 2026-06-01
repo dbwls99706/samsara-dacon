@@ -94,9 +94,9 @@ input.ts ─► state.ts ──EngineEvent──► main.ts ──► render/wor
 
 | 지표 | 수치 | 검증 |
 |---|---|---|
-| 코어 번들 (gzip) | **113 KB** — 외부 자산 0 byte | `npm run build` → `dist/assets/index-*.js` |
+| 코어 번들 (gzip) | **115 KB** — 외부 자산 0 byte | `npm run build` → `dist/assets/index-*.js` |
 | Supabase 청크 | 52 KB gzip — **lazy**, 리더보드 진입 시만 | 코드 분할, 초기 로드 미포함 |
-| 단위/통합 테스트 | **196 passed / 15 files** | `npm test` |
+| 단위/통합 테스트 | **207 passed / 15 files** | `npm test` |
 | E2E smoke (모바일 UA) | http 200 / load < 1.1s / 콘솔 errors+warnings 0 | `npm run test:e2e` |
 | 심사자 첫 인상 봇 (32s 입력 sim) | 콘솔 errors 0 / W1 진입 / canvas 등장 < 5s | `npm run test:impression` |
 | Lighthouse-lite (mobile) | FCP **259ms** / CLS **0** / a11y clean / long-task ≤ 1 | `npm run test:lh` |
@@ -104,7 +104,7 @@ input.ts ─► state.ts ──EngineEvent──► main.ts ──► render/wor
 | TypeScript | **strict** 모드, 빌드 워닝 0 | `npm run build` |
 | 헤드리스 밸런스 | `scripts/balance-sim.ts` 자동 플레이어 RI별 점수 측정 | `npx tsx scripts/balance-sim.ts` |
 | 외부 의존성 | Vite, Vitest, Playwright (dev), Supabase JS (RLS만, 키 노출 OK) | `package.json` |
-| CI/CD | GitHub Actions: build · test · e2e · impression 4 게이트 | `.github/workflows/ci.yml` |
+| CI/CD | GitHub Actions: build · test · 브라우저 게이트(e2e · impression · lighthouse) | `.github/workflows/ci.yml` |
 
 ### 백엔드 (Supabase, 키 노출형 RLS)
 
@@ -177,7 +177,7 @@ create policy "lb_insert" on leaderboard for insert with check (
 
 ```bash
 npm install
-npm test                  # vitest — 196 passed / 15 files
+npm test                  # vitest — 207 passed / 15 files
 npm run build             # tsc(strict) + vite build → dist/, 워닝 0
 npm run dev               # http://localhost:5173
 npm run preview           # 빌드 결과 미리보기 — http://localhost:4173
@@ -204,8 +204,8 @@ src/
 └── main.ts    # 부트스트랩 + EngineEvent 구독 + juice
 docs/          # 기획·전략 문서 28종
 scripts/       # balance-sim · build-proposal-pdf · e2e-smoke · e2e-impression · lighthouse-lite · demo-record · judge-session · check-sfx-orphans
-tests/         # vitest 15 파일 / 196 spec
-.github/       # workflows/ci.yml (build · test · e2e · impression)
+tests/         # vitest 15 파일 / 207 spec
+.github/       # workflows/ci.yml (build · test · e2e · impression · lighthouse)
 ```
 
 ### 핵심 파일 빠른 참조
