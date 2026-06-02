@@ -129,19 +129,19 @@ playRoot.innerHTML = `
   <div id="hud-top" style="position:absolute;top:env(safe-area-inset-top,0);left:0;right:0;padding:12px clamp(10px,3vw,20px);display:flex;justify-content:space-between;align-items:flex-start;font-family:Galmuri11,monospace;text-shadow:0 0 8px rgba(0,0,0,0.9);pointer-events:none;gap:clamp(6px,2vw,14px);">
     <div class="hud-frame" style="border-color:rgba(255,215,0,0.3);padding:7px clamp(10px,2.2vw,16px);flex:0 1 auto;min-width:0">
       <div class="hud-label" style="color:rgba(255,215,0,0.85);font-size:clamp(9px,2.4vw,12px);letter-spacing:2px;white-space:nowrap">점수</div>
-      <div id="hud-score" style="font-size:clamp(24px,7vw,38px);color:var(--gold);font-weight:bold;animation:hud-pulse-gold 3s ease-in-out infinite;letter-spacing:1px;line-height:1.1">0</div>
+      <div id="hud-score" style="font-size:clamp(24px,7vw,38px);color:var(--gold);font-weight:bold;animation:hud-pulse-gold 3s ease-in-out infinite;letter-spacing:1px;line-height:1.1;font-variant-numeric:tabular-nums">0</div>
       <div id="hud-runscore-wrap" style="display:none;align-items:baseline;gap:5px;margin-top:1px">
         <span style="font-size:8px;color:rgba(255,215,0,0.55);letter-spacing:1px;font-weight:bold;white-space:nowrap">누적</span>
         <span id="hud-runscore" style="font-size:12px;color:rgba(255,215,0,0.85);font-weight:bold;letter-spacing:0.5px">0</span>
       </div>
     </div>
-    <div class="hud-frame" style="text-align:center;border-color:rgba(255,255,255,0.16);padding:7px clamp(10px,2.4vw,18px);flex:0 0 auto">
+    <div class="hud-frame" style="text-align:center;border-color:rgba(255,255,255,0.16);padding:7px clamp(10px,2.4vw,18px);position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:1">
       <div class="hud-label" style="color:rgba(255,255,255,0.45);font-size:clamp(8px,2vw,10px);letter-spacing:2px;white-space:nowrap">WAVE</div>
       <div id="hud-wave" style="font-size:clamp(20px,5.5vw,28px);color:var(--text);font-weight:bold;letter-spacing:2px;line-height:1.1">W0</div>
     </div>
     <div class="hud-frame" style="text-align:right;border-color:rgba(5,217,232,0.3);padding:7px clamp(10px,2.2vw,16px);flex:0 1 auto;min-width:0">
       <div class="hud-label" style="color:rgba(5,217,232,0.85);font-size:clamp(9px,2.4vw,12px);letter-spacing:2px;white-space:nowrap">TIME</div>
-      <div id="hud-time" style="font-size:clamp(24px,7vw,38px);color:var(--ice);font-weight:bold;letter-spacing:1px;text-shadow:0 0 10px rgba(5,217,232,0.5);line-height:1.1">30.0</div>
+      <div id="hud-time" style="font-size:clamp(24px,7vw,38px);color:var(--ice);font-weight:bold;letter-spacing:1px;text-shadow:0 0 10px rgba(5,217,232,0.5);line-height:1.1;font-variant-numeric:tabular-nums">30.0</div>
     </div>
   </div>
 

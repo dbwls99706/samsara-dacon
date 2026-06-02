@@ -1585,6 +1585,7 @@ export function mountCardPick(host: HTMLElement, engine: Engine): () => void {
   playSfx('sfx_card_appear', 0.45); // 카드 등장음 (이전엔 sfx.json 에 있으나 미배선 orphan)
   const state = engine.getState();
   const choices = engine.drawCardChoices(3 + state.extraCardChoiceCount);
+  let clicked = false;
 
   const root = el('div', `
     position:fixed;inset:0;
@@ -1616,6 +1617,8 @@ export function mountCardPick(host: HTMLElement, engine: Engine): () => void {
   const ownedCards = state.cards as Card[];
   for (const c of choices) {
     cards.appendChild(cardEl(c, () => {
+      if (clicked) return;
+      clicked = true;
       engine.dispatch({ type: 'PICK_CARD', card: c });
       // 업적 트래킹
       const tr = loadTracker();
@@ -1656,6 +1659,8 @@ export function mountCardPick(host: HTMLElement, engine: Engine): () => void {
     rerollBtn.onmouseenter = () => { rerollBtn.style.transform = 'translateY(-1px)'; rerollBtn.style.boxShadow = '0 6px 20px rgba(255,215,0,0.6)'; };
     rerollBtn.onmouseleave = () => { rerollBtn.style.transform = ''; rerollBtn.style.boxShadow = '0 4px 14px rgba(255,215,0,0.4)'; };
     rerollBtn.onclick = () => {
+      if (clicked) return;
+      clicked = true;
       const mut = engine.getState() as import('../game/types.js').GameState;
       mut.rerollsRemaining -= 1;
       go('cardPick'); // 다시 mount → 새 추첨
@@ -1678,6 +1683,8 @@ export function mountCardPick(host: HTMLElement, engine: Engine): () => void {
   skipBtn.onmouseenter = () => { skipBtn.style.background = 'rgba(46,32,76,0.85)'; skipBtn.style.color = 'var(--text)'; skipBtn.style.borderColor = 'rgba(255,255,255,0.3)'; };
   skipBtn.onmouseleave = () => { skipBtn.style.background = 'rgba(26,20,46,0.7)'; skipBtn.style.color = 'var(--text-dim)'; skipBtn.style.borderColor = 'rgba(255,255,255,0.15)'; };
   skipBtn.onclick = () => {
+    if (clicked) return;
+    clicked = true;
     engine.dispatch({ type: 'SKIP_CARD' });
     go('play');
     setTimeout(() => {
