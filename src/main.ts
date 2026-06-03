@@ -115,6 +115,32 @@ playRoot.innerHTML = `
     body.samsara-show-fps #hud-fps-frame { display: block !important; }
     @keyframes hud-fadein { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes input-hint-pulse { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
+    @media (max-width: 520px) {
+      #hud-top { padding: 9px 10px !important; }
+      #hud-top .hud-frame { padding: 6px 10px !important; }
+      #hud-score, #hud-time { font-size: clamp(25px, 8.5vw, 34px) !important; }
+      #hud-wave { font-size: clamp(19px, 5.8vw, 25px) !important; }
+      #hud-callout { top: calc(env(safe-area-inset-top,0) + 92px) !important; max-width: 58vw !important; }
+      #hud-minimap {
+        top: 118px !important;
+        right: 10px !important;
+        width: min(29vw, 124px) !important;
+        height: min(29vw, 124px) !important;
+        border-width: 1px !important;
+        border-radius: 10px !important;
+        opacity: 0.86;
+      }
+      #hud-weapons {
+        top: calc(118px + min(29vw, 124px) + 10px) !important;
+        right: 9px !important;
+        gap: 7px !important;
+        max-width: 42vw !important;
+      }
+      #hud-xpbar-wrap { bottom: 70px !important; left: 20px !important; right: 20px !important; }
+      #hud-bottom { padding: 12px 20px !important; }
+      #hud-bottom .hud-frame { padding: 8px 12px !important; }
+      #hud-input-hint { bottom: 124px !important; max-width: calc(100vw - 44px); white-space: normal !important; text-align:center; line-height:1.35; }
+    }
     /* ⭐ 가로/짧은 화면(landscape 폰 등) — 세로 무기 레일(top:316px column)이 390px 높이를
        넘어 잘리던 것(호환성 감사 P1) 해소. 미니맵 축소·상향 + 레일을 가로 wrap 행으로. */
     @media (max-height: 500px) {
@@ -194,9 +220,9 @@ playRoot.innerHTML = `
     <div id="hud-fps-frame" class="hud-frame" style="padding:9px 16px;border-color:rgba(255,255,255,0.14);font-size:14px;letter-spacing:1.5px;display:none">FPS <span id="hud-fps" style="color:var(--ice);font-weight:bold">60</span></div>
   </div>
 
-  <canvas id="hud-minimap" width="220" height="220" style="position:absolute;top:128px;right:16px;width:176px;height:176px;background:linear-gradient(135deg,rgba(0,0,8,0.85),rgba(10,5,28,0.85));border:2px solid rgba(5,217,232,0.6);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.7),0 0 18px rgba(5,217,232,0.3),inset 0 0 14px rgba(5,217,232,0.18);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);"></canvas>
+  <canvas id="hud-minimap" width="220" height="220" style="position:absolute;top:128px;right:16px;width:150px;height:150px;background:linear-gradient(135deg,rgba(0,0,8,0.82),rgba(10,5,28,0.78));border:1.5px solid rgba(5,217,232,0.55);border-radius:12px;box-shadow:0 5px 16px rgba(0,0,0,0.62),0 0 14px rgba(5,217,232,0.24),inset 0 0 12px rgba(5,217,232,0.14);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);"></canvas>
 
-  <div id="hud-weapons" style="position:absolute;top:316px;right:16px;display:flex;flex-direction:column;gap:10px;font-family:Galmuri11,monospace;pointer-events:none;"></div>
+  <div id="hud-weapons" style="position:absolute;top:290px;right:16px;display:flex;flex-direction:column;gap:8px;font-family:Galmuri11,monospace;pointer-events:none;"></div>
 
   <div id="pause-menu" style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(14,8,34,0.88),rgba(2,1,10,0.96));display:none;flex-direction:column;align-items:center;justify-content:safe center;overflow-y:auto;padding:24px 0;z-index:20;font-family:Galmuri11,monospace;pointer-events:auto;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);">
     <!-- 회전 인장 (배경 깊이) -->
@@ -2096,7 +2122,7 @@ function renderWeaponHud() {
   //   사용자 "초반에 가진 스킬이 뭔지도 모르겠다" → 신규 유저는 아이콘만으론 무기를 인지 못 함.
   //   1런 생존 후/W3+ 부터는 라벨 접고 깔끔한 아이콘 레일로 복귀 (progressive disclosure).
   const meta = engine.getState().meta as any;
-  const teach = (meta.totalCycles ?? 0) === 0 && engine.getState().wave <= 2;
+  const teach = (meta.totalCycles ?? 0) === 0 && engine.getState().wave <= 1 && engine.getState().elapsed < 14;
 
   // 구조 signature — 변하면 innerHTML 전면 재생성. 평소엔 cooldown 만 부분 업데이트.
   // teach 플래그도 시그니처에 포함 → 교육 구간 종료(W3 진입) 시 라벨 자동 제거.
@@ -2115,17 +2141,17 @@ function renderWeaponHud() {
       const name = (w as any).displayName ?? (w.id.startsWith('starter_') ? 'STARTER' : w.tag.toUpperCase());
       // 교육 라벨 — 아이콘 왼쪽(레일이 우측 정렬이므로 왼쪽으로 자란다). 이름만, 짧게.
       const label = teach
-        ? `<div style="font-size:11px;color:${evolved ? '#ffd700' : ringColor};font-weight:bold;letter-spacing:0.5px;background:rgba(10,10,26,0.78);border:1px solid ${ringColor}55;border-radius:9px;padding:4px 9px;white-space:nowrap;text-shadow:0 0 6px rgba(0,0,0,0.9);box-shadow:0 2px 8px rgba(0,0,0,0.4);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);">${name}</div>`
+        ? `<div style="font-size:10px;color:${evolved ? '#ffd700' : ringColor};font-weight:bold;letter-spacing:0.2px;background:rgba(10,10,26,0.76);border:1px solid ${ringColor}50;border-radius:8px;padding:3px 7px;white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 6px rgba(0,0,0,0.9);box-shadow:0 2px 8px rgba(0,0,0,0.32);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);">${name}</div>`
         : '';
       // title = 데스크톱 hover 시 이름/레벨 확인 (시각 클러터 0, 접근성 보조)
       const circle = `
-        <div data-wpn-idx="${idx}" title="${name} · Lv.${w.level} · ${w.cooldownMax.toFixed(1)}s" style="position:relative;width:46px;height:46px;flex-shrink:0;border-radius:50%;background:rgba(10,10,26,0.6);border:1px solid ${border};box-shadow:${shadow};-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);">
+        <div data-wpn-idx="${idx}" title="${name} · Lv.${w.level} · ${w.cooldownMax.toFixed(1)}s" style="position:relative;width:42px;height:42px;flex-shrink:0;border-radius:50%;background:rgba(10,10,26,0.58);border:1px solid ${border};box-shadow:${shadow};-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);">
           <div data-cd-wrap="${idx}" data-ring="${ringColor}" style="position:absolute;inset:3px;border-radius:50%;">
             <div style="position:absolute;inset:0;background:rgba(0,0,0,0.5);border-radius:50%;border:1px solid rgba(255,255,255,0.1);"></div>
             <div data-cd-fill="${idx}" style="position:absolute;inset:0;background:conic-gradient(${ringColor} 0%,transparent 0);border-radius:50%;mask:radial-gradient(circle, transparent 56%, black 58%);-webkit-mask:radial-gradient(circle, transparent 56%, black 58%);filter:drop-shadow(0 0 4px ${ringColor}88);"></div>
-            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:19px;">${emoji}</div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:17px;">${emoji}</div>
           </div>
-          <div style="position:absolute;bottom:-3px;right:-3px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:${evolved ? '#ffd700' : '#0a0a1a'};border:1px solid ${ringColor};color:${evolved ? '#0a0a1a' : ringColor};font-size:9px;font-weight:bold;line-height:13px;text-align:center;font-family:Galmuri11,monospace;">${evolved ? '★' : w.level}</div>
+          <div style="position:absolute;bottom:-3px;right:-3px;min-width:14px;height:14px;padding:0 3px;border-radius:8px;background:${evolved ? '#ffd700' : '#0a0a1a'};border:1px solid ${ringColor};color:${evolved ? '#0a0a1a' : ringColor};font-size:8px;font-weight:bold;line-height:12px;text-align:center;font-family:Galmuri11,monospace;">${evolved ? '★' : w.level}</div>
         </div>`;
       return `<div style="display:flex;align-items:center;justify-content:flex-end;gap:7px;">${label}${circle}</div>`;
     }).join('');

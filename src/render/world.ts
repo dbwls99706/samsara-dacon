@@ -1045,7 +1045,7 @@ export function drawWorld(world: World, runIdentity: string | null, t: number): 
     const dsy = (p.pos.y - cy) + H / 2;
     const margin = 120;
     if (dsx < -margin || dsx > W + margin || dsy < -margin || dsy > H + margin) continue;
-
+    ctx.globalAlpha = 1; // 이전 prop 의 fade 가 누수되지 않게 매 iteration 리셋
     // 파괴 애니 (1초 fade + 다층 shockwave)
     const destroying = p.destroyedAt != null;
     if (destroying) {
@@ -1090,6 +1090,18 @@ export function drawWorld(world: World, runIdentity: string | null, t: number): 
       continue;
     }
 
+    // ⭐ HUD 세이프존 페이드 — 장식용 prop 본체가 하단 XP바·스탯 HUD / 상단 점수·WAVE·TIME 칩
+    //   밴드 뒤에서 "UI 아래 버려진 잔해"처럼 선명히 깔려 지저분하던 클러터 제거.
+    //   gameplay 액터(적/픽업/플레이어/투사체)는 이 루프 밖이라 무영향 — 색-팀 위협 가독성 보존.
+    //   부드러운 램프(경계 통과 시 팝 방지) + 바닥값(완전소멸 X, prop 위치는 여전히 인지 가능).
+    //   hazard 텔레그래프(블랙홀/등불/별먼지 글로우)는 각자 절대 alpha 라 fade 영향 없이 유지(경고 가독성).
+    let hudFade = 1;
+    const botBand = 132; // 하단 XP바 + 체력/레벨/카드 스탯 HUD 점유 높이
+    if (dsy > H - botBand) hudFade = Math.min(hudFade, 0.32 + 0.68 * Math.max(0, (H - dsy) / botBand));
+    const topBand = 104; // 상단 점수 / WAVE / TIME 칩 밴드
+    if (dsy < topBand) hudFade = Math.min(hudFade, 0.4 + 0.6 * Math.max(0, dsy / topBand));
+    ctx.globalAlpha = hudFade;
+
     // ⭐ 지면 그림자 및 앰비언트 글로우 — 땅에 닿은 prop 모두. 공중 prop 제외.
     // 그림자는 항상 prop 아래(+y) 에 고정 — 회전·flip 영향 받지 않음.
     {
@@ -1120,7 +1132,7 @@ export function drawWorld(world: World, runIdentity: string | null, t: number): 
           ctx.globalCompositeOperation = 'source-over';
         }
         
-        ctx.globalAlpha = 0.40;
+        ctx.globalAlpha = 0.40 * hudFade;
         ctx.fillStyle = '#000';
         ctx.beginPath();
         ctx.ellipse(dsx, dsy + p.radius * 0.85, p.radius * 0.95, p.radius * 0.28, 0, 0, Math.PI * 2);
