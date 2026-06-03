@@ -32,7 +32,7 @@ import { achievementById, evaluate, loadTracker, saveTracker, trackCardPick } fr
 import { track } from './services/analytics.js';
 import { clearBoss, createWorld, setColorblindMode, spawnBoss, spawnEnemy, tickWorld, type World } from './game/world.js';
 import { applyWeapons, buildWeapons } from './game/weapons.js';
-import { drawWorld, getWorldCanvas, initWorldRender, spawnKillBurst } from './render/world.js';
+import { drawWorld, getWorldCanvas, initWorldRender, spawnKillBurst, triggerRebirthFlash } from './render/world.js';
 import { consumeDash, initInput, readInput } from './game/input.js';
 import { bossKind, isBossWave } from './game/boss.js';
 import { biomeAt, getTerrainSeed } from './game/terrain.js';
@@ -452,7 +452,7 @@ function startNewWave(wave: number) {
   if (isBossWave(wave)) {
     bossSilenceWarning(wave);
     setTimeout(() => {
-      spawnBoss(world, performance.now(), 1 + wave * 0.1, bossKind(wave) ?? 'normal');
+      spawnBoss(world, performance.now(), 1 + wave * 0.16, bossKind(wave) ?? 'normal');
     }, 1500);
   }
   rebuildWeapons();
@@ -839,6 +839,12 @@ engine.subscribeEvents((e: EngineEvent) => {
       break;
     case 'TEXT_BANNER':
       flashOverlay(e.text, e.durationMs);
+      // ⭐ 부활 = 환생 — 죽음에서 빛으로 재구성되는 시각 연출(#2, GO 와 동일 메커니즘).
+      if (e.text === '윤회 · 還生') {
+        triggerRebirthFlash(performance.now());
+        const rm = (engine.getState().meta as any).reducedMotion;
+        spawnParticles('supernova', window.innerWidth / 2, window.innerHeight / 2, rm ? 0 : 28);
+      }
       break;
     case 'LIFE_LOST': {
       // ⭐ 강화된 피해 피드백 — 사용자 피드백 "피해를 입히는 건 명확하게 피해를 입히는 느낌"
@@ -1664,6 +1670,15 @@ function countdown(wave: number) {
   let i = 0;
   const PER = 420;
   function step() {
+    // ⭐ 사용자 #3 — 카운트다운 진행 중 카드픽/레벨업 모달이 뜨면 3-2-1 을 '즉시 파괴'하고 탈출.
+    //   시작 시점(1632)만 체크하던 갭: 카운트다운 도중 카드 선택이 열리면 큰 숫자가 그 위로
+    //   계속 떠 선택을 방해/불쾌. 매 스텝 재검사로 '카드 선택 중엔 시간 정지'를 끝까지 보장.
+    //   (겹침이 없으면 매 스텝 no-op.) countdownEndsAt 도 즉시 만료시켜 다운스트림 게이트 해제.
+    if (getScreen() !== 'play' || document.getElementById('levelup-modal')) {
+      countdownEndsAt = 0;
+      try { host.remove(); } catch {}
+      return;
+    }
     if (i >= stages.length) {
       setTimeout(() => host.remove(), PER);
       return;
@@ -1671,6 +1686,14 @@ function countdown(wave: number) {
     const s = stages[i];
     const isGo = s.label === 'GO';
     playSfx(s.sfx);
+
+    // ⭐ 환생(윤회) 순간 — GO 와 동시에 플레이어가 빛에서 재구성(#2). 화면 중앙(=카메라 추적
+    //   플레이어 위치)에 supernova 버스트 + 스프라이트 화이트 램프인. "이어하기"가 아닌 "새 생".
+    if (isGo) {
+      triggerRebirthFlash(performance.now());
+      const rm = (engine.getState().meta as any).reducedMotion;
+      spawnParticles('supernova', window.innerWidth / 2, window.innerHeight / 2, rm ? 0 : 22);
+    }
 
     const main = document.createElement('div');
     main.style.cssText = `
@@ -2139,10 +2162,15 @@ function renderWeaponHud() {
       const border = evolved ? '#ffd700' : 'rgba(255,255,255,0.18)';
       const shadow = evolved ? '0 0 14px rgba(255,215,0,0.45)' : '0 3px 8px rgba(0,0,0,0.4)';
       const name = (w as any).displayName ?? (w.id.startsWith('starter_') ? 'STARTER' : w.tag.toUpperCase());
-      // 교육 라벨 — 아이콘 왼쪽(레일이 우측 정렬이므로 왼쪽으로 자란다). 이름만, 짧게.
-      const label = teach
-        ? `<div style="font-size:10px;color:${evolved ? '#ffd700' : ringColor};font-weight:bold;letter-spacing:0.2px;background:rgba(10,10,26,0.76);border:1px solid ${ringColor}50;border-radius:8px;padding:3px 7px;white-space:nowrap;max-width:90px;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 6px rgba(0,0,0,0.9);box-shadow:0 2px 8px rgba(0,0,0,0.32);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);">${name}</div>`
-        : '';
+      // ⭐ 무기 이름 라벨 — 아이콘 왼쪽(레일 우측정렬 → 왼쪽으로 자람). 이름만.
+      //   사용자 #5 "무슨 무기 쓰는지 하나도 모르겠다" → 상시 노출(빌드 항상 인지).
+      //   단 #4(색 정신없음/클러터) 균형 위해 평상시엔 9px 초소형·옅은 글래스 pill,
+      //   FTUE(teach: 첫사이클 W1 14초) 땐 10px 로 살짝 강조. (clutter 재유입 방지.)
+      const lblFs = teach ? 10 : 9;
+      const lblBg = teach ? 0.74 : 0.56;
+      const lblBd = teach ? '50' : '3a';
+      const lblPad = teach ? '3px 7px' : '2px 6px';
+      const label = `<div class="wpn-name-label" style="font-size:${lblFs}px;color:${evolved ? '#ffd700' : ringColor};font-weight:bold;letter-spacing:0.2px;background:rgba(10,10,26,${lblBg});border:1px solid ${ringColor}${lblBd};border-radius:8px;padding:${lblPad};white-space:nowrap;max-width:94px;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 6px rgba(0,0,0,0.9);box-shadow:0 2px 7px rgba(0,0,0,0.3);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);">${name}</div>`;
       // title = 데스크톱 hover 시 이름/레벨 확인 (시각 클러터 0, 접근성 보조)
       const circle = `
         <div data-wpn-idx="${idx}" title="${name} · Lv.${w.level} · ${w.cooldownMax.toFixed(1)}s" style="position:relative;width:42px;height:42px;flex-shrink:0;border-radius:50%;background:rgba(10,10,26,0.58);border:1px solid ${border};box-shadow:${shadow};-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);">

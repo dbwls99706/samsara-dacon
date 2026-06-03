@@ -183,10 +183,13 @@ export function biomeWeight(propKind: PropKindLike, x: number, y: number, seed: 
 /** biome 별 그리드 배경 틴트 (RGB 0..255 + 알파 강도).
  *  ⭐ 알파 0.10~0.25 — 우주 배경 위에서 biome 영역이 뚜렷이 식별되도록 강화. */
 export const BIOME_TINT: Record<BiomeKind, { r: number; g: number; b: number; a: number }> = {
-  mountain:  { r: 110, g: 130, b: 165, a: 0.18 },   // 차가운 파란 회색 (산악)
-  plains:    { r: 80,  g: 110, b: 120, a: 0.10 },   // 어두운 시안 (평원)
-  cursed:    { r: 200, g: 40,  b: 175, a: 0.24 },   // 짙은 마젠타 (위험)
-  sanctuary: { r: 240, g: 200, b:  90, a: 0.22 },   // 황금 (성역)
+  // ⭐ 채도 감쇠(사용자 #4 "색 정신없어") — 바닥 biome 틴트가 셀마다 다른 색 패치를 만들어 배경
+  //   색 노이즈가 컸음. 브랜드 hex 는 유지하되 바닥 앰비언트 알파만 ~40% 낮춰 gameplay 액터가
+  //   calmer 배경 위로 도드라지게. (biome 효과는 prop/라벨이 텔레그래프 — 바닥 틴트는 분위기용.)
+  mountain:  { r: 110, g: 130, b: 165, a: 0.11 },   // 차가운 파란 회색 (산악)
+  plains:    { r: 80,  g: 110, b: 120, a: 0.06 },   // 어두운 시안 (평원)
+  cursed:    { r: 200, g: 40,  b: 175, a: 0.15 },   // 짙은 마젠타 (위험)
+  sanctuary: { r: 240, g: 200, b:  90, a: 0.14 },   // 황금 (성역)
 };
 
 // ─────────────────────────── World seed 헬퍼 ───────────────────────────

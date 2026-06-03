@@ -5,7 +5,7 @@
 
 import { Engine, dailySeed, loadMeta, saveMeta } from '../game/core.js';
 import { applyWeapons, buildWeapons } from '../game/weapons.js';
-import { isBossWave } from '../game/boss.js';
+import { isBossWave, bossKind } from '../game/boss.js';
 import { createWorld, spawnBoss, spawnEnemy, tickWorld, type World } from '../game/world.js';
 import { consumeDash, readInput } from '../game/input.js';
 import type { GameState } from '../game/types.js';
@@ -47,7 +47,7 @@ export function createGameRuntime(): GameRuntime {
       if (choices[0]) engine.dispatch({ type: 'PICK_CARD', card: choices[0] });
     }
     if (isBossWave(wave)) {
-      spawnBoss(world, performance.now(), 1 + wave * 0.1);
+      spawnBoss(world, performance.now(), 1 + wave * 0.16, bossKind(wave) ?? 'normal');
     }
     rebuildWeapons();
     engine.dispatch({ type: 'START_WAVE', wave });

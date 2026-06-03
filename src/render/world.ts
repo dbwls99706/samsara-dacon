@@ -17,6 +17,13 @@ let dpr = 1;
 let tigerImg: HTMLImageElement | null = null;
 let tigerLoaded = false;
 
+// ⭐ 환생(윤회) 플래시 — 매 웨이브 GO 순간 플레이어가 '빛에서 재구성'되는 연출(사용자 #2
+//   "환생이 아니라 그냥 이어서 하는 거잖아"). 게임플레이 상태 0 변경 — 순수 시각 프레이밍.
+//   main.ts countdown GO 스텝에서 triggerRebirthFlash() 호출. drawPlayer 가 화이트 램프인 적용.
+let rebirthFlashAt = -9999;
+const REBIRTH_FLASH_MS = 520;
+export function triggerRebirthFlash(t: number): void { rebirthFlashAt = t; }
+
 // 캐릭터 + 적 + 픽업 스프라이트 사전 로드 (없으면 캔버스 도형 fallback)
 const characterImgs: Record<string, HTMLImageElement> = {};
 const enemyImgs: Record<string, HTMLImageElement> = {};
@@ -178,12 +185,12 @@ function drawAtmosphereDust(ctx: CanvasRenderingContext2D, cx: number, cy: numbe
   ctx.save();
   ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
   ctx.globalCompositeOperation = 'screen';
-  const numDust = 40;
+  const numDust = 26; // #4 떠다니는 먼지 반짝임 감쇠(40→26) — 배경 시각 노이즈 ↓
   for (let i = 0; i < numDust; i++) {
     const px = (((i * 2137 + t * 0.04 - cx * 0.2) % W) + W) % W;
     const py = (((i * 3421 + Math.sin(t * 0.001 + i) * 30 - cy * 0.2) % H) + H) % H;
     const size = 1 + (i % 2);
-    ctx.globalAlpha = 0.1 + 0.4 * Math.max(0, Math.sin(t * 0.003 + i));
+    ctx.globalAlpha = 0.07 + 0.26 * Math.max(0, Math.sin(t * 0.003 + i));
     ctx.fillRect(px, py, size, size);
   }
   ctx.restore();
@@ -1316,7 +1323,7 @@ export function drawWorld(world: World, runIdentity: string | null, t: number): 
     ctx.save();
     ctx.translate(sx, sy);
     ctx.rotate(g.rot);
-    ctx.fillStyle = `rgba(180, 100, 220, ${g.alpha})`;
+    ctx.fillStyle = `rgba(180, 100, 220, ${g.alpha * 0.6})`; // #4 배경 글리프 색 노이즈 감쇠
     ctx.font = `${g.size}px 'Galmuri11', monospace`;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(g.ch, 0, 0);
@@ -1360,7 +1367,7 @@ export function drawWorld(world: World, runIdentity: string | null, t: number): 
       // 이전 ±10% → ±22% 로 강화 — 산악과 평지의 시각 단차 뚜렷.
       const elev = sample.elevation;
       if (elev > 0.05) {
-        const aBright = Math.min(0.22, elev * 0.22);
+        const aBright = Math.min(0.13, elev * 0.13);
         const lg = ctx.createRadialGradient(
           sx + biomeCell / 2, sy + biomeCell / 2, 0,
           sx + biomeCell / 2, sy + biomeCell / 2, biomeCell * 0.7
@@ -1370,7 +1377,7 @@ export function drawWorld(world: World, runIdentity: string | null, t: number): 
         ctx.fillStyle = lg;
         ctx.fillRect(sx, sy, biomeCell, biomeCell);
       } else if (elev < -0.05) {
-        const aDark = Math.min(0.20, -elev * 0.20);
+        const aDark = Math.min(0.12, -elev * 0.12);
         ctx.fillStyle = `rgba(0,4,15,${aDark})`;
         ctx.fillRect(sx, sy, biomeCell, biomeCell);
       }
@@ -1937,6 +1944,14 @@ function drawPlayer(w: World, cx: number, cy: number, W: number, H: number, runI
         const alpha = Math.max(0, (w.player.hitFlashUntil - t) / 250);
         ctx.globalCompositeOperation = 'source-atop';
         ctx.fillStyle = `rgba(255, 60, 60, ${alpha * 0.7})`;
+        ctx.fillRect(-size / 2, -size / 2, size, size);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+      // ⭐ 환생 화이트 램프인 — GO 직후 스프라이트가 백색광에서 본래 색으로 되살아남(#2 윤회 체감).
+      const rbK = (t - rebirthFlashAt) / REBIRTH_FLASH_MS;
+      if (rbK >= 0 && rbK < 1) {
+        ctx.globalCompositeOperation = 'source-atop';
+        ctx.fillStyle = `rgba(255, 255, 255, ${(1 - rbK) * 0.92})`;
         ctx.fillRect(-size / 2, -size / 2, size, size);
         ctx.globalCompositeOperation = 'source-over';
       }

@@ -472,7 +472,8 @@ function handleLifeLoss(state: GameState, emit: (e: EngineEvent) => void) {
     if (state.reviveAvailable > 0) {
       state.reviveAvailable -= 1;
       state.life = 1;
-      emit({ type: 'TEXT_BANNER', text: 'REVIVE', durationMs: 1500 });
+      // ⭐ 윤회 — 부활을 '환생'으로 프레이밍(#2). 죽음이 끝이 아니라 새 생으로 돌아옴.
+      emit({ type: 'TEXT_BANNER', text: '윤회 · 還生', durationMs: 1600 });
       emit({ type: 'SFX', id: 'sfx_revive' });
       dispatchTrigger(state, 'onRevive', emit);
     } else {
