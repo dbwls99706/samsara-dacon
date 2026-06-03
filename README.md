@@ -5,8 +5,8 @@
 > DACON 월간 해커톤 출품작 — "10분 안에 중독시켜라" 웹 미니게임 챌린지
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![tests](https://img.shields.io/badge/vitest-207%20passing-brightgreen.svg)](#산출물-요약-검증-가능)
-[![bundle](https://img.shields.io/badge/core%20gzip-115KB-blue.svg)](#산출물-요약-검증-가능)
+[![tests](https://img.shields.io/badge/vitest-208%20passing-brightgreen.svg)](#산출물-요약-검증-가능)
+[![bundle](https://img.shields.io/badge/core%20gzip-117KB-blue.svg)](#산출물-요약-검증-가능)
 [![lighthouse](https://img.shields.io/badge/FCP-259ms-brightgreen.svg)](#산출물-요약-검증-가능)
 [![assets](https://img.shields.io/badge/external%20assets-0%20byte-success.svg)](#라이선스--자산-출처)
 [![CI](https://img.shields.io/badge/CI-build%20·%20test%20·%20e2e-blue.svg)](.github/workflows/ci.yml)
@@ -32,7 +32,7 @@
 
 | 평가 항목 | 배점 | 어디서 확인 | 검증 방법 |
 |---|---|---|---|
-| **완성도** | 25 | 207 vitest + 빌드 워닝 0 + 60fps 유지 + CI green | `npm test` → 207 passed / 15 files |
+| **완성도** | 25 | 208 vitest + 빌드 워닝 0 + 60fps 유지 + CI green | `npm test` → 208 passed / 15 files |
 | **참신성** | 20 | **윤회(輪廻): 죽으면 이전 생의 카드가 다음 생으로 계승** + 30초 카드픽 + 28 Run Identity 변신 | `src/data/cards.json` |
 | **사용성** | 20 | 첫 입력 < 3초, 첫 보상 < 30초, 색약/모션감쇄 지원 | `src/ui/screens.ts` mountTutorial |
 | **일관성** | 20 | docs/ 28종 기획문서 ↔ 코드 1:1, 데이터 주도 설계 | `src/game/cards.ts` (58 op) |
@@ -94,9 +94,9 @@ input.ts ─► state.ts ──EngineEvent──► main.ts ──► render/wor
 
 | 지표 | 수치 | 검증 |
 |---|---|---|
-| 코어 번들 (gzip) | **115 KB** — 외부 자산 0 byte | `npm run build` → `dist/assets/index-*.js` |
+| 코어 번들 (gzip) | **116.56 KB** — 외부 자산 0 byte | `npm run build` → `dist/assets/index-*.js` |
 | Supabase 청크 | 52 KB gzip — **lazy**, 리더보드 진입 시만 | 코드 분할, 초기 로드 미포함 |
-| 단위/통합 테스트 | **207 passed / 15 files** | `npm test` |
+| 단위/통합 테스트 | **208 passed / 15 files** | `npm test` |
 | E2E smoke (모바일 UA) | http 200 / load < 1.1s / 콘솔 errors+warnings 0 | `npm run test:e2e` |
 | 심사자 첫 인상 봇 (32s 입력 sim) | 콘솔 errors 0 / W1 진입 / canvas 등장 < 5s | `npm run test:impression` |
 | Lighthouse-lite (mobile) | FCP **259ms** / CLS **0** / a11y clean / long-task ≤ 1 | `npm run test:lh` |
@@ -177,7 +177,7 @@ create policy "lb_insert" on leaderboard for insert with check (
 
 ```bash
 npm install
-npm test                  # vitest — 207 passed / 15 files
+npm test                  # vitest — 208 passed / 15 files
 npm run build             # tsc(strict) + vite build → dist/, 워닝 0
 npm run dev               # http://localhost:5173
 npm run preview           # 빌드 결과 미리보기 — http://localhost:4173
@@ -204,7 +204,7 @@ src/
 └── main.ts    # 부트스트랩 + EngineEvent 구독 + juice
 docs/          # 기획·전략 문서 28종
 scripts/       # balance-sim · build-proposal-pdf · e2e-smoke · e2e-impression · lighthouse-lite · demo-record · judge-session · check-sfx-orphans
-tests/         # vitest 15 파일 / 207 spec
+tests/         # vitest 15 파일 / 208 spec
 .github/       # workflows/ci.yml (build · test · e2e · impression · lighthouse)
 ```
 
