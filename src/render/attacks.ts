@@ -48,46 +48,38 @@ export function drawAttackFx(ctx: CanvasRenderingContext2D, cx: number, cy: numb
 
     switch (f.kind) {
       case 'claw': {
-        // ⭐ 할퀴기 — 캐릭터에서 '발사되어 나가는' 게 아니라 제자리에서 '샥-샥' 긁는 스와이프.
-        //   발톱 자국은 방사형으로 자라지 않고, 공격 호(arc)를 가로질러 빠르게 쓸고 지나간다.
-        //   두 번의 교차 스트로크(X 자국) = "샥샥". 범위(range)는 그대로 — 끝은 항상 range 에 닿음.
-        const startR = f.range * 0.30;   // 발톱 시작 = 캐릭터 근처(고정 — 안 자람)
-        const endR = f.range;            // 끝 = 항상 range 까지 (범위 유지)
-        // 두 스트로크: 첫 번째(k<0.55) ↘, 두 번째(k≥0.45) ↗ — 시간차 교차 긁기.
-        const strokes: Array<{ on: boolean; lk: number; dir: number }> = [
-          { on: k < 0.55,  lk: k / 0.55,            dir:  1 },
-          { on: k >= 0.45, lk: (k - 0.45) / 0.55,   dir: -1 },
-        ];
-        for (const st of strokes) {
-          if (!st.on) continue;
-          const lk = Math.max(0, Math.min(1, st.lk));
-          const swipeA = Math.sin(lk * Math.PI);   // 진입→이탈 페이드 (빠른 스침)
-          const sweep = (lk - 0.5) * 0.85 * st.dir; // 호를 가로지르는 각 스윕
-          const tilt = st.dir * 0.16;               // 두 스트로크를 X 자로 약간 기울임
-          for (let n = -1; n <= 1; n++) {
-            const off = n * 0.2 + sweep + tilt;     // 3 평행 발톱선 + 전체 스윕
-            const baseW = 4 + (n === 0 ? 1.6 : 0);  // 가운데 두껍게
-            ctx.lineWidth = baseW * (0.35 + swipeA * 0.65);
+        // ⭐ 메이플스토리 '매직클로' 풍 — 두 갈래 발톱 에너지가 살짝 V 로 벌어져 앞으로 짧게
+        //   쏘아졌다 사라진다. 각 갈래 = 곡선 3-prong 발톱. 선두 밝은 팁 + 꼬리 모션블러로
+        //   '쐈다' 느낌. startR→endR 전진(짧은 사거리, 범위 유지). 빠르고 펀치감 있게.
+        const reach = f.range;
+        const travel = Math.min(1, k * 1.5);                 // 앞으로 전진(후반은 정지)
+        const headR = reach * (0.34 + 0.66 * travel);        // 발톱 선두 위치
+        const tailR = reach * (0.10 + 0.50 * travel);        // 꼬리(모션블러 시작)
+        const fade = k < 0.5 ? 1 : 1 - (k - 0.5) / 0.5;      // 후반 페이드아웃
+        for (const side of [-1, 1]) {                        // 두 갈래 (V 스프레드)
+          const base = side * 0.21;
+          for (let n = -1; n <= 1; n++) {                    // 발톱 3-prong
+            const off = base + n * 0.075;
+            ctx.lineWidth = (3 + (n === 0 ? 1.6 : 0)) * (0.4 + fade * 0.6);
             ctx.lineCap = 'round';
-            ctx.globalAlpha = alpha * swipeA;       // 스트로크별 자체 페이드 (둘 다 선명)
-            const sa = off - 0.05, ea = off + 0.05;
-            const sx0 = Math.cos(sa) * startR, sy0 = Math.sin(sa) * startR;
-            const ex = Math.cos(ea) * endR, ey = Math.sin(ea) * endR;
-            const midR = (startR + endR) * 0.5, ma = (sa + ea) * 0.5;
-            const mx = Math.cos(ma) * midR * 1.06, my = Math.sin(ma) * midR * 1.06;
+            ctx.globalAlpha = alpha * fade * (n === 0 ? 1 : 0.78);
+            const hx = Math.cos(off) * headR, hy = Math.sin(off) * headR;
+            const ta = off - side * 0.06;                    // 꼬리는 살짝 안쪽으로 휘어
+            const tx = Math.cos(ta) * tailR, ty = Math.sin(ta) * tailR;
+            const ma = (off + ta) * 0.5, mr = (headR + tailR) * 0.5;
+            const mx = Math.cos(ma) * mr * 1.05, my = Math.sin(ma) * mr * 1.05;
             ctx.beginPath();
-            ctx.moveTo(sx0, sy0);
-            ctx.quadraticCurveTo(mx, my, ex, ey);
+            ctx.moveTo(tx, ty);
+            ctx.quadraticCurveTo(mx, my, hx, hy);
             ctx.stroke();
           }
-          // 끝자락 spark — 발톱이 스치는 순간만 살짝
-          if (swipeA > 0.7) {
+          // 선두 에너지 팁 — 밝은 흰 점 (쏘아지는 느낌)
+          if (fade > 0.35) {
             ctx.fillStyle = '#fff';
-            ctx.globalAlpha = alpha * (swipeA - 0.7) * 2;
-            const off = sweep + tilt;
-            const px = Math.cos(off) * endR * 0.98, py = Math.sin(off) * endR * 0.98;
+            ctx.globalAlpha = alpha * fade;
+            const tx = Math.cos(base) * headR, ty = Math.sin(base) * headR;
             ctx.beginPath();
-            ctx.arc(px, py, 2.3, 0, Math.PI * 2);
+            ctx.arc(tx, ty, 2.6, 0, Math.PI * 2);
             ctx.fill();
           }
         }

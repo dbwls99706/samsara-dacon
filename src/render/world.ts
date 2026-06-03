@@ -1168,43 +1168,60 @@ export function drawWorld(world: World, runIdentity: string | null, t: number): 
       drawDecoration(p as any, dsx, dsy, t);
     }
 
-    // ── 머리 위 아이콘 라벨 (큰 이모지 + 펄스 — "여기 가서 먹어!" 시그널) ──
+    // ── 머리 위 역할 라벨 (아이콘 + 역할 텍스트 pill — "이게 뭐 하는 기물인지" 한눈에) ──
+    //   사용자 "특수 기물 무슨 역할인지 잘 눈에 띄게" → 추상 아이콘만으론 인지 불가했던 것을
+    //   짧은 한글 역할어를 동반한 pill 로 명시. 위험 기물은 빨강 계열(색-팀: 빨강=위협, colorblind
+    //   보조로 아이콘+텍스트 병기). 역할어는 실제 효과 기반(world.ts 기물 주석 참조).
     {
-      const labelMap: Record<string, { icon: string; color: string }> = {
-        shrine:    { icon: '★', color: '#ffd700' },  // 보상 + Pray
-        wreck:     { icon: '♥', color: '#ff3366' },  // 체력 (점진 채굴)
-        stardust:  { icon: '⚡', color: '#b14aff' },  // 부스트 (Adaptive)
-        asteroid:  { icon: '◆', color: '#7a6088' },  // Kinetic
-        blackhole: { icon: '⚠', color: '#ff2a6d' },  // 위험
-        lantern:   { icon: '❄', color: '#05d9e8' },  // 슬로우 영역
-        // ⭐ 신규 props 라벨 (자연물은 라벨 제거하여 시각적 복잡도 감소)
-        pressure_plate: { icon: '◉', color: '#ffaa00' },  // 압전판 — Chicken
-        beacon:         { icon: '☼', color: '#ff6f00' },  // 봉화 — Greed
-        mirror_shard:   { icon: '◈', color: '#05d9e8' },  // 거울 — 반사
-        cursed_totem:   { icon: '☠', color: '#d300c5' },  // 저주 — Stag Hunt
+      const labelMap: Record<string, { icon: string; role: string; color: string; danger?: boolean }> = {
+        shrine:         { icon: '★', role: '보상',  color: '#ffd700' },                 // 파괴=코인폭우 / Pray=+maxHP
+        wreck:          { icon: '♥', role: '체력',  color: '#ff6699' },                 // 점진 채굴 — 첫 히트 heart
+        stardust:       { icon: '✦', role: '부스트', color: '#c98bff' },                // Full HP=가속+무적 / 손상=heal
+        asteroid:       { icon: '◆', role: '포탄',  color: '#9a86b0' },                 // Kinetic — 맞히면 적에게 돌진
+        blackhole:      { icon: '⚠', role: '흡입',  color: '#ff2a6d', danger: true },   // 인력장 — 빨려들어감(위험)
+        lantern:        { icon: '❄', role: '강화',  color: '#05d9e8' },                 // 공속+30% + 적 감속 지대
+        pressure_plate: { icon: '◉', role: '함정',  color: '#ffaa00', danger: true },   // 접촉=노바 폭발(-1 HP)
+        beacon:         { icon: '☼', role: '코인↑', color: '#ffb13c' },                 // 250px 내 코인 +50%
+        mirror_shard:   { icon: '◈', role: '반사',  color: '#05d9e8' },                 // 적 발사체 되받아침
+        cursed_totem:   { icon: '☠', role: '저주',  color: '#ff2a6d', danger: true },   // 파괴=대보상 + elite 3 즉시
       };
       const lab = labelMap[p.kind];
       if (lab && !p.consumed) {
-        const labY = dsy - p.radius - 22;
+        const labY = dsy - p.radius - 20;
         const pulse = 0.85 + 0.15 * Math.sin(t / 280 + p.seed);
         ctx.save();
-        // 둥근 배경
-        ctx.fillStyle = 'rgba(0,0,0,0.7)';
-        ctx.beginPath();
-        ctx.arc(dsx, labY, 11, 0, Math.PI * 2);
-        ctx.fill();
-        // 보더 (글로우)
+        ctx.font = "bold 10px Galmuri11, monospace";
+        const text = `${lab.icon} ${lab.role}`;
+        const tw = ctx.measureText(text).width;
+        const padX = 7, h = 17, w = tw + padX * 2;
+        const x = dsx - w / 2, y = labY - h / 2;
+        const c = ctx!; // drawWorld 상단에서 null 가드 완료 — 클로저 내로잉용 별칭
+        const rr = (rx: number, ry: number, rw: number, rh: number, rd: number) => {
+          c.beginPath();
+          if ((c as any).roundRect) (c as any).roundRect(rx, ry, rw, rh, rd);
+          else c.rect(rx, ry, rw, rh);
+        };
+        // 배경 pill — 위험은 어두운 적색, 보상은 어두운 남색
+        ctx.fillStyle = lab.danger ? 'rgba(34,4,12,0.84)' : 'rgba(6,7,20,0.82)';
+        rr(x, y, w, h, 8); ctx.fill();
+        // 보더 + 글로우
         ctx.strokeStyle = lab.color;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 1.3;
         ctx.shadowColor = lab.color;
-        ctx.shadowBlur = 10 * pulse;
-        ctx.stroke();
-        // 아이콘
+        ctx.shadowBlur = 8 * pulse;
+        rr(x, y, w, h, 8); ctx.stroke();
         ctx.shadowBlur = 0;
+        // 기물을 가리키는 작은 꼬리 tick
         ctx.fillStyle = lab.color;
-        ctx.font = 'bold 14px monospace';
+        ctx.globalAlpha = 0.7;
+        ctx.beginPath();
+        ctx.moveTo(dsx - 3, y + h); ctx.lineTo(dsx + 3, y + h); ctx.lineTo(dsx, y + h + 4);
+        ctx.closePath(); ctx.fill();
+        ctx.globalAlpha = 1;
+        // 텍스트
+        ctx.fillStyle = lab.color;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(lab.icon, dsx, labY + 0.5);
+        ctx.fillText(text, dsx, labY + 0.5);
         ctx.restore();
       }
     }
