@@ -102,7 +102,7 @@ function makeClaw(): Weapon {
       }
       // 시각 효과를 위해 player.facing 갱신
       w.player.facing = a0;
-      spawnAttackFx({ kind: 'claw', pos: { ...w.player.pos }, angle: a0, range: 80, color: '#ff8866', duration: 0.25, thickness: 4 });
+      spawnAttackFx({ kind: 'claw', pos: { ...w.player.pos }, angle: a0, range: 80, color: '#ff8866', duration: 0.3, thickness: 4 });
     },
   };
 }

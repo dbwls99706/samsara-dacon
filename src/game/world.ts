@@ -291,7 +291,7 @@ export function createWorld(): World {
     cameraZoom: 1,
     cameraZoomTarget: 1,
     xp: 0,
-    xpForNext: 16, // 10→16: 첫 카드를 ~30초(첫 보상 리듬, CLAUDE §6.4)에 맞춤. 기존 10은 광속(~10초)이라 성취감 희박(사용자 #6).
+    xpForNext: 35, // 첫 카드 요구 XP — 광속 레벨업(기존 10) 방지로 성취감 페이싱(#6). ⚠ 35는 첫 카드가 ~30초 첫보상(CLAUDE §6.4) 윈도를 넘길 수 있어 실플레이 체감 확인 권장.
     level: 1,
     pendingLevelUps: 0,
     props: generateProps(),
@@ -657,7 +657,7 @@ const ENEMY_DEF: Record<EnemyKind, Omit<Enemy, 'id' | 'pos' | 'vel' | 'spawnTime
   exploder:  { kind: 'exploder',  hp: 2,  hpMax: 2,  speed: 100, radius: 17, damage: 20, coinDrop: 10, xpDrop: 5, color: '#ffaa00' },
   summoner:  { kind: 'summoner',  hp: 12, hpMax: 12, speed: 35,  radius: 23, damage: 8,  coinDrop: 20, xpDrop: 8, color: '#d300c5' },
   jangsan:   { kind: 'jangsan',   hp: 30, hpMax: 30, speed: 90,  radius: 28, damage: 25, coinDrop: 50, xpDrop: 20, color: '#ff3366' },
-  boss:      { kind: 'boss',      hp: 300, hpMax: 300, speed: 50, radius: 60, damage: 50, coinDrop: 500, xpDrop: 100, color: '#ff2a6d' },
+  boss:      { kind: 'boss',      hp: 400, hpMax: 400, speed: 50, radius: 60, damage: 50, coinDrop: 500, xpDrop: 100, color: '#ff2a6d' },
 };
 
 const MAX_ENEMIES = 200;
@@ -764,7 +764,7 @@ export function spawnBoss(world: World, t: number, hpMult: number = 1, kind: Bos
   // ⭐ kind 별 HP 배율 — 기존엔 hpMult(웨이브 비례)만 적용되고 mega/divine 의 '격'이 HP 에 0 반영
   //   이라 후반 보스가 플레이어 DPS 대비 물렁했음(사용자 #1 "보스 너무 쉬움"). normal=1 유지,
   //   mega/divine 은 클라이맥스 전투답게 묵직하게. (divine 은 25/50/75 희소 → 과하지 않게 4.0.)
-  const kindHpMult = kind === 'divine' ? 4.0 : kind === 'mega' ? 2.2 : 1.0;
+  const kindHpMult = kind === 'divine' ? 8.0 : kind === 'mega' ? 3.5 : 1.2;
   const bossHp = def.hpMax * hpMult * kindHpMult;
   const e: Enemy = {
     ...def,

@@ -48,50 +48,50 @@ export function drawAttackFx(ctx: CanvasRenderingContext2D, cx: number, cy: numb
 
     switch (f.kind) {
       case 'claw': {
-        // ⭐ 진짜 할퀴기 — 3 평행 사선 자국 (부채꼴 X). 곡률 + 가운데 두꺼움 + 끝 tapered.
-        // 각 줄: 시작점은 가까이 모이고 끝점은 부채꼴로 벌어져 자연스러운 발톱 자국.
-        // k=0 짧음 → k=0.5 max length → k=1 페이드.
-        const lenK = Math.sin(k * Math.PI);  // 0 → 1 → 0 (휘둘림 모션)
-        const startR = f.range * 0.2 * lenK;
-        const endR = f.range * (0.85 + 0.15 * lenK);
-        for (let n = -1; n <= 1; n++) {
-          const off = n * 0.28;
-          // 가운데(0)는 두껍게, 양 끝(±1)은 얇게 — 타이거 발톱 중심부 강조.
-          const baseW = 4.5 + (n === 0 ? 1.5 : 0);
-          ctx.lineWidth = baseW * (1 - k * 0.7);
-          ctx.lineCap = 'round';
-          // 시작-끝 각도 (사선 streak)
-          const sa = off - 0.08;
-          const ea = off + 0.08;
-          const sx0 = Math.cos(sa) * startR;
-          const sy0 = Math.sin(sa) * startR;
-          const ex = Math.cos(ea) * endR;
-          const ey = Math.sin(ea) * endR;
-          // 곡률 — 안쪽으로 살짝 휘어진 streak
-          const midR = (startR + endR) * 0.5;
-          const ma = (sa + ea) * 0.5;
-          const mx = Math.cos(ma) * midR * 1.05;
-          const my = Math.sin(ma) * midR * 1.05;
-          ctx.beginPath();
-          ctx.moveTo(sx0, sy0);
-          ctx.quadraticCurveTo(mx, my, ex, ey);
-          ctx.stroke();
-        }
-        // 미세 spark dots — 발톱 끝 지점에서 튀는 입자 효과
-        if (k < 0.5) {
-          ctx.fillStyle = '#fff';
-          ctx.globalAlpha = alpha * (1 - k * 2);
+        // ⭐ 할퀴기 — 캐릭터에서 '발사되어 나가는' 게 아니라 제자리에서 '샥-샥' 긁는 스와이프.
+        //   발톱 자국은 방사형으로 자라지 않고, 공격 호(arc)를 가로질러 빠르게 쓸고 지나간다.
+        //   두 번의 교차 스트로크(X 자국) = "샥샥". 범위(range)는 그대로 — 끝은 항상 range 에 닿음.
+        const startR = f.range * 0.30;   // 발톱 시작 = 캐릭터 근처(고정 — 안 자람)
+        const endR = f.range;            // 끝 = 항상 range 까지 (범위 유지)
+        // 두 스트로크: 첫 번째(k<0.55) ↘, 두 번째(k≥0.45) ↗ — 시간차 교차 긁기.
+        const strokes: Array<{ on: boolean; lk: number; dir: number }> = [
+          { on: k < 0.55,  lk: k / 0.55,            dir:  1 },
+          { on: k >= 0.45, lk: (k - 0.45) / 0.55,   dir: -1 },
+        ];
+        for (const st of strokes) {
+          if (!st.on) continue;
+          const lk = Math.max(0, Math.min(1, st.lk));
+          const swipeA = Math.sin(lk * Math.PI);   // 진입→이탈 페이드 (빠른 스침)
+          const sweep = (lk - 0.5) * 0.85 * st.dir; // 호를 가로지르는 각 스윕
+          const tilt = st.dir * 0.16;               // 두 스트로크를 X 자로 약간 기울임
           for (let n = -1; n <= 1; n++) {
-            const off = n * 0.28 + 0.08;
-            const r = f.range * 0.95;
-            const px = Math.cos(off) * r;
-            const py = Math.sin(off) * r;
+            const off = n * 0.2 + sweep + tilt;     // 3 평행 발톱선 + 전체 스윕
+            const baseW = 4 + (n === 0 ? 1.6 : 0);  // 가운데 두껍게
+            ctx.lineWidth = baseW * (0.35 + swipeA * 0.65);
+            ctx.lineCap = 'round';
+            ctx.globalAlpha = alpha * swipeA;       // 스트로크별 자체 페이드 (둘 다 선명)
+            const sa = off - 0.05, ea = off + 0.05;
+            const sx0 = Math.cos(sa) * startR, sy0 = Math.sin(sa) * startR;
+            const ex = Math.cos(ea) * endR, ey = Math.sin(ea) * endR;
+            const midR = (startR + endR) * 0.5, ma = (sa + ea) * 0.5;
+            const mx = Math.cos(ma) * midR * 1.06, my = Math.sin(ma) * midR * 1.06;
             ctx.beginPath();
-            ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+            ctx.moveTo(sx0, sy0);
+            ctx.quadraticCurveTo(mx, my, ex, ey);
+            ctx.stroke();
+          }
+          // 끝자락 spark — 발톱이 스치는 순간만 살짝
+          if (swipeA > 0.7) {
+            ctx.fillStyle = '#fff';
+            ctx.globalAlpha = alpha * (swipeA - 0.7) * 2;
+            const off = sweep + tilt;
+            const px = Math.cos(off) * endR * 0.98, py = Math.sin(off) * endR * 0.98;
+            ctx.beginPath();
+            ctx.arc(px, py, 2.3, 0, Math.PI * 2);
             ctx.fill();
           }
-          ctx.globalAlpha = alpha;
         }
+        ctx.globalAlpha = alpha;
         break;
       }
       case 'arc': {

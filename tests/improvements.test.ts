@@ -7,11 +7,13 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   OPS,
+  allCards,
   drawCards,
   getSynergy,
   newGameState,
   setRngSeed,
 } from '../src/game/cards';
+import { reduce } from '../src/game/state';
 import { attachBossRuntime, stepBossPattern, isBossInvuln, type FsmEvent } from '../src/game/bossPatterns';
 import { createWorld, spawnBoss } from '../src/game/world';
 import type { EngineEvent, TriggerContext } from '../src/game/types';
@@ -188,5 +190,31 @@ describe('보스 패턴 FSM', () => {
     expect(rt.invulnUntilT).toBeGreaterThan(800);
     expect(w.enemies.length).toBeGreaterThan(enemyCountBefore); // jab 부하 spawn
     expect(isBossInvuln(w, 1000)).toBe(true);
+  });
+});
+
+describe('윤회 부활 카드 교체 (회귀 — 무기 재구축 버그 가드)', () => {
+  it('부활 시 카드 개수는 불변·내용(id 시그니처)은 변경된다', () => {
+    // Arrange — 같은 등급(common) 카드 4장 보유 + 부활 1회 가용, 잔여 생명 1
+    const s = newGameState();
+    const commons = allCards().filter(c => c.rarity === 'common');
+    expect(commons.length).toBeGreaterThan(4); // 교체 풀이 존재해야 의미 있음
+    s.cards = commons.slice(0, 4).map(c => ({ ...c }));
+    s.reviveAvailable = 1;
+    s.life = 1;
+    const lenBefore = s.cards.length;
+    const sigBefore = s.cards.map(c => c.id).slice().sort().join(',');
+
+    // Act — 생명 0 → 부활 트리거 (BOSS_FAILED → handleLifeLoss)
+    const after = reduce(s, { type: 'BOSS_FAILED' }).state;
+
+    // Assert — 부활 소비 + 생명 복구 + 개수 불변 + 내용(시그니처) 변경
+    //   ⚠ 개수 불변이라 과거 main.ts length 게이트는 무기 재구축을 못 했음. 이제 id 시그니처
+    //   변화로 재구축되므로, '내용이 바뀐다'는 이 단언이 그 수정의 회귀 가드다.
+    expect(after.reviveAvailable).toBe(0);
+    expect(after.life).toBe(1);
+    expect(after.cards.length).toBe(lenBefore);
+    const sigAfter = after.cards.map(c => c.id).slice().sort().join(',');
+    expect(sigAfter).not.toBe(sigBefore);
   });
 });

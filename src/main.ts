@@ -452,7 +452,7 @@ function startNewWave(wave: number) {
   if (isBossWave(wave)) {
     bossSilenceWarning(wave);
     setTimeout(() => {
-      spawnBoss(world, performance.now(), 1 + wave * 0.16, bossKind(wave) ?? 'normal');
+      spawnBoss(world, performance.now(), 1 + wave * 0.24, bossKind(wave) ?? 'normal');
     }, 1500);
   }
   rebuildWeapons();
@@ -874,11 +874,15 @@ engine.subscribeEvents((e: EngineEvent) => {
   }
 });
 
-// 카드 선택 시 무기 재구성
-let lastCardCount = 0;
+// 카드 집합 변경 시 무기 재구성.
+// ⚠ 개수가 아니라 '내용(카드 id 시그니처)' 비교 — 부활 윤회 교체는 개수 불변(카드 1장 교체)
+//   이라 개수 게이트로는 무기가 안 바뀌던 버그. 추가/교체 모두 이 시그니처로 잡는다.
+//   ([[feedback_subscribestate_tdz]]: lastCardSig 는 subscribeState 호출 이전에 선언.)
+let lastCardSig = '';
 engine.subscribeState((s) => {
-  if (s.cards.length !== lastCardCount) {
-    lastCardCount = s.cards.length;
+  const sig = s.cards.map(c => c.id).join(',');
+  if (sig !== lastCardSig) {
+    lastCardSig = sig;
     rebuildWeapons();
   }
 });
@@ -1635,7 +1639,11 @@ function countdown(wave: number) {
   // ⭐ 카드 선택/의식/레벨업 중에는 3-2-1 을 띄우지 않는다 (사용자: "카드 선택 중엔 시간 정지").
   //   픽이 끝나 play 화면으로 돌아온 뒤에 카운트다운 → 화면 가림/겹침 원천 차단.
   //   (countdownEndsAt 는 '실제 표시 시점'에 설정 → 18회차 레벨업 모달 게이트와 완전 상호배타.)
-  if (getScreen() !== 'play' || document.getElementById('levelup-modal')) {
+    const phase = engine.getState().phase;
+  if (getScreen() !== 'play' ||
+      (phase !== 'playing' && phase !== 'boss') ||
+      _zoomingToCardPick ||
+      document.getElementById('levelup-modal')) {
     setTimeout(() => countdown(wave), 120);
     return;
   }
@@ -1674,7 +1682,11 @@ function countdown(wave: number) {
     //   시작 시점(1632)만 체크하던 갭: 카운트다운 도중 카드 선택이 열리면 큰 숫자가 그 위로
     //   계속 떠 선택을 방해/불쾌. 매 스텝 재검사로 '카드 선택 중엔 시간 정지'를 끝까지 보장.
     //   (겹침이 없으면 매 스텝 no-op.) countdownEndsAt 도 즉시 만료시켜 다운스트림 게이트 해제.
-    if (getScreen() !== 'play' || document.getElementById('levelup-modal')) {
+        const phase = engine.getState().phase;
+    if (getScreen() !== 'play' ||
+        (phase !== 'playing' && phase !== 'boss') ||
+        _zoomingToCardPick ||
+        document.getElementById('levelup-modal')) {
       countdownEndsAt = 0;
       try { host.remove(); } catch {}
       return;
@@ -2166,11 +2178,12 @@ function renderWeaponHud() {
       //   사용자 #5 "무슨 무기 쓰는지 하나도 모르겠다" → 상시 노출(빌드 항상 인지).
       //   단 #4(색 정신없음/클러터) 균형 위해 평상시엔 9px 초소형·옅은 글래스 pill,
       //   FTUE(teach: 첫사이클 W1 14초) 땐 10px 로 살짝 강조. (clutter 재유입 방지.)
-      const lblFs = teach ? 10 : 9;
-      const lblBg = teach ? 0.74 : 0.56;
-      const lblBd = teach ? '50' : '3a';
-      const lblPad = teach ? '3px 7px' : '2px 6px';
-      const label = `<div class="wpn-name-label" style="font-size:${lblFs}px;color:${evolved ? '#ffd700' : ringColor};font-weight:bold;letter-spacing:0.2px;background:rgba(10,10,26,${lblBg});border:1px solid ${ringColor}${lblBd};border-radius:8px;padding:${lblPad};white-space:nowrap;max-width:94px;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 6px rgba(0,0,0,0.9);box-shadow:0 2px 7px rgba(0,0,0,0.3);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);">${name}</div>`;
+            // ⭐ 무기 이름 라벨 — 가독성 대폭 향상 (폰트 확대, 투명도 상향, 가로폭 확대하여 무기 식별 직관화)
+      const lblFs = teach ? 12 : 11;
+      const lblBg = teach ? 0.85 : 0.82;
+      const lblBd = teach ? '77' : '66';
+      const lblPad = teach ? '3px 8px' : '2px 7px';
+      const label = `<div class="wpn-name-label" style="font-size:${lblFs}px;color:${evolved ? '#ffd700' : ringColor};font-weight:bold;letter-spacing:0.2px;background:rgba(10,10,26,${lblBg});border:1px solid ${ringColor}${lblBd};border-radius:8px;padding:${lblPad};white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 6px rgba(0,0,0,0.9);box-shadow:0 2px 7px rgba(0,0,0,0.3);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);">${name}</div>`;
       // title = 데스크톱 hover 시 이름/레벨 확인 (시각 클러터 0, 접근성 보조)
       const circle = `
         <div data-wpn-idx="${idx}" title="${name} · Lv.${w.level} · ${w.cooldownMax.toFixed(1)}s" style="position:relative;width:42px;height:42px;flex-shrink:0;border-radius:50%;background:rgba(10,10,26,0.58);border:1px solid ${border};box-shadow:${shadow};-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);">

@@ -1107,6 +1107,8 @@ export function drawWorld(world: World, runIdentity: string | null, t: number): 
     if (dsy > H - botBand) hudFade = Math.min(hudFade, 0.32 + 0.68 * Math.max(0, (H - dsy) / botBand));
     const topBand = 104; // 상단 점수 / WAVE / TIME 칩 밴드
     if (dsy < topBand) hudFade = Math.min(hudFade, 0.4 + 0.6 * Math.max(0, dsy / topBand));
+    const rightBand = 160; // 우측 미니맵 + 무기 레일 HUD 점유 너비 (사용자 #4 가독성 정돈)
+    if (dsx > W - rightBand) hudFade = Math.min(hudFade, 0.32 + 0.68 * Math.max(0, (W - dsx) / rightBand));
     ctx.globalAlpha = hudFade;
 
     // ⭐ 지면 그림자 및 앰비언트 글로우 — 땅에 닿은 prop 모두. 공중 prop 제외.

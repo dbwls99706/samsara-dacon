@@ -16,6 +16,7 @@ import {
   dispatchTrigger,
   evalRunIdentity,
   getCard,
+  allCards,
 } from './cards.js';
 import { applyModifier, checkSecretUnlocks, pickModifier } from './modifiers.js';
 import { bossSpec, isBossWave } from './boss.js';
@@ -384,6 +385,17 @@ function handlePickCard(state: GameState, card: Card, emit: (e: EngineEvent) => 
   state.cards = [...state.cards, card];
   state.stats.cardsPicked += 1;
 
+  // ⭐ 카드 선택 피드백 강화 (도파민 극대화)
+  const countBefore = state.cards.filter(c => c.id === card.id).length - 1; // 방금 추가했으므로 -1
+  const cardName = card.name_ko || card.id;
+  const raritySymbol = card.rarity === 'legendary' ? '★ ' : card.rarity === 'epic' ? '◆ ' : card.rarity === 'rare' ? '■ ' : '● ';
+  const actionText = countBefore > 0 ? '강화 (Lv.' + (countBefore + 1) + ')' : '획득';
+  emit({ 
+    type: 'TEXT_BANNER', 
+    text: raritySymbol + cardName + ' ' + actionText + '!', 
+    durationMs: 1400 
+  });
+
   // 시너지 재평가 + 새로 활성된 시너지 효과 즉시 1회 적용
   const synBefore = new Set(state.activeSynergies);
   const syn = activeSynergies(state.cards);
@@ -472,8 +484,46 @@ function handleLifeLoss(state: GameState, emit: (e: EngineEvent) => void) {
     if (state.reviveAvailable > 0) {
       state.reviveAvailable -= 1;
       state.life = 1;
-      // ⭐ 윤회 — 부활을 '환생'으로 프레이밍(#2). 죽음이 끝이 아니라 새 생으로 돌아옴.
-      emit({ type: 'TEXT_BANNER', text: '윤회 · 還生', durationMs: 1600 });
+      
+      // ⭐ 윤회(환생) 메커니즘: 부활 시 무작위 카드 1장이 다른 카드로 교체됨 (SamsaraIdentity)
+      let transMsg = '';
+      if (state.cards.length > 0) {
+        const targetIdx = Math.floor(Math.random() * state.cards.length);
+        const oldCard = state.cards[targetIdx];
+
+        // 같은 등급의 다른 카드 중에서 무작위 추첨
+        const pool = allCards().filter(c => c.id !== oldCard.id && c.rarity === oldCard.rarity);
+        if (pool.length > 0) {
+          const newCard = pool[Math.floor(Math.random() * pool.length)];
+          const synBefore = new Set(state.activeSynergies);
+          state.cards[targetIdx] = newCard;
+          // 시너지/RI 재평가 + 새로 활성된 효과 즉시 적용.
+          // ⚠ recalcAfterCardMutation(cards.ts)은 배너만 갱신하고 runEffectsImmediate/ri.bonus 를
+          //   안 돌려 '교체해도 효과 미적용'이던 버그. handlePickCard 와 동일하게 effect 까지 적용.
+          const syn = activeSynergies(state.cards);
+          state.activeSynergies = syn.map(s => s.id);
+          for (const s of syn) {
+            if (synBefore.has(s.id)) continue;
+            emit({ type: 'SYNERGY_FIRED', id: s.id, tier: s.tier });
+            emit({ type: 'SFX', id: `sfx_synergy_${s.tag}_${s.tier}` });
+            state.stats.synergyTriggers[s.id] = (state.stats.synergyTriggers[s.id] ?? 0) + 1;
+            runEffectsImmediate(state, s.effects, emit);
+          }
+          const ri = evalRunIdentity(state.cards);
+          if (ri && ri.id !== state.runIdentity) {
+            state.runIdentity = ri.id;
+            emit({ type: 'IDENTITY_FIRED', id: ri.id });
+            if (ri.bonus) runEffectsImmediate(state, ri.bonus, emit);
+          } else if (!ri && state.runIdentity) {
+            state.runIdentity = null;
+          }
+          // 무기 재구축은 main.ts subscribeState 가 카드 id 시그니처 변화를 감지해 자동 수행
+          // (개수 불변이라 과거 length 게이트로는 안 잡히던 것 → 시그니처 게이트로 수정함).
+          transMsg = ' [' + (oldCard.name_ko || oldCard.id) + ' ➔ ' + (newCard.name_ko || newCard.id) + ']';
+        }
+      }
+      
+      emit({ type: 'TEXT_BANNER', text: '윤회 · 還生' + transMsg, durationMs: 2500 });
       emit({ type: 'SFX', id: 'sfx_revive' });
       dispatchTrigger(state, 'onRevive', emit);
     } else {

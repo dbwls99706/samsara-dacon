@@ -47,7 +47,7 @@ export function createGameRuntime(): GameRuntime {
       if (choices[0]) engine.dispatch({ type: 'PICK_CARD', card: choices[0] });
     }
     if (isBossWave(wave)) {
-      spawnBoss(world, performance.now(), 1 + wave * 0.16, bossKind(wave) ?? 'normal');
+      spawnBoss(world, performance.now(), 1 + wave * 0.24, bossKind(wave) ?? 'normal');
     }
     rebuildWeapons();
     engine.dispatch({ type: 'START_WAVE', wave });
