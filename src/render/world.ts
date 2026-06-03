@@ -385,42 +385,52 @@ function drawDecoration(d: DecoLite, sx: number, sy: number, t: number) {
   const invSize = 1 / d.size;
   switch (d.kind) {
     case 'asteroid': {
-      // 네오펑크 크리스탈 모노리스 (미니멀 육각형)
-      ctx.fillStyle = 'rgba(0,0,0,0.6)';
+      // ⭐ 위협적인 운석 — 접촉 시 피해(hazard). 색-팀 규칙(빨강=위협): 적색 언더글로우 +
+      //   삐죽삐죽 바위 실루엣 + 달궈진 코어. "우리 팀처럼 안 보이게" 명확히 위험 신호.
+      // 삐죽한 8각 바위 (정점마다 반경 흔들어 거친 운석 실루엣)
+      const verts = 8;
+      const jag = (i: number) => 12 + Math.sin(i * 2.7 + d.seed * 3) * 3.2; // 8.8~15.2
+      // 적색 위협 언더글로우 (펄스)
+      const pulseR = 18 + 3 * Math.sin(t / 260 + d.seed);
+      const ug = ctx.createRadialGradient(0, 0, 0, 0, 0, pulseR);
+      ug.addColorStop(0, 'rgba(255,70,30,0.42)');
+      ug.addColorStop(1, 'rgba(255,70,30,0)');
+      ctx.fillStyle = ug;
+      ctx.beginPath(); ctx.arc(0, 0, pulseR, 0, Math.PI * 2); ctx.fill();
+      // 접지 그림자
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
       ctx.beginPath();
-      // 육각형 그림자
-      for (let i = 0; i < 6; i++) {
-        const a = (i / 6) * Math.PI * 2 + d.rot;
-        const px = Math.cos(a) * 12 + 2, py = Math.sin(a) * 12 + 2;
+      for (let i = 0; i < verts; i++) {
+        const a = (i / verts) * Math.PI * 2 + d.rot;
+        const r = jag(i);
+        const px = Math.cos(a) * r + 2, py = Math.sin(a) * r + 2.5;
         if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
       }
-      ctx.closePath();
-      ctx.fill();
-      
-      // 본체 (다크 퍼플-그레이)
-      const grad = ctx.createLinearGradient(-10, -10, 10, 10);
-      grad.addColorStop(0, '#3a2a4a');
-      grad.addColorStop(1, '#1a1226');
+      ctx.closePath(); ctx.fill();
+      // 본체 — 검붉게 달궈진 바위
+      const grad = ctx.createLinearGradient(-12, -12, 12, 12);
+      grad.addColorStop(0, '#5a1f12');
+      grad.addColorStop(1, '#2a0d08');
       ctx.fillStyle = grad;
-      ctx.strokeStyle = '#b14aff'; // 보라색 네온
-      ctx.lineWidth = 1.5 * invSize;
-      ctx.shadowColor = '#b14aff';
-      ctx.shadowBlur = (8 + 4 * Math.sin(t / 400 + d.seed)) * invSize;
+      ctx.strokeStyle = '#ff5a2a'; // 적색 네온 림
+      ctx.lineWidth = 1.6 * invSize;
+      ctx.shadowColor = '#ff3a1a';
+      ctx.shadowBlur = (10 + 5 * Math.sin(t / 300 + d.seed)) * invSize;
       ctx.beginPath();
-      for (let i = 0; i < 6; i++) {
-        const a = (i / 6) * Math.PI * 2 + d.rot;
-        const px = Math.cos(a) * 12, py = Math.sin(a) * 12;
+      for (let i = 0; i < verts; i++) {
+        const a = (i / verts) * Math.PI * 2 + d.rot;
+        const r = jag(i);
+        const px = Math.cos(a) * r, py = Math.sin(a) * r;
         if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
       }
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-      
-      // 내부 코어 빛
-      ctx.fillStyle = '#b14aff';
-      ctx.beginPath();
-      ctx.arc(0, 0, 3, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      // 달궈진 균열 코어 (주황→흰 핫스팟)
+      const cg = ctx.createRadialGradient(0, 0, 0, 0, 0, 5);
+      cg.addColorStop(0, '#fff3d0');
+      cg.addColorStop(0.5, '#ff8c2a');
+      cg.addColorStop(1, 'rgba(255,90,20,0)');
+      ctx.fillStyle = cg;
+      ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill();
       ctx.shadowBlur = 0;
       break;
     }
@@ -1060,7 +1070,7 @@ export function drawWorld(world: World, runIdentity: string | null, t: number): 
       const kind = p.kind;
       const ringColor = kind === 'shrine' ? '#ffd700'
                       : kind === 'wreck' ? '#ff8866'
-                      : kind === 'asteroid' ? '#b14aff'
+                      : kind === 'asteroid' ? '#ff5a2a'
                       : '#b14aff';
       ctx.save();
       // 본체 잔영 (수축)
@@ -1177,7 +1187,7 @@ export function drawWorld(world: World, runIdentity: string | null, t: number): 
         shrine:         { icon: '★', role: '보상',  color: '#ffd700' },                 // 파괴=코인폭우 / Pray=+maxHP
         wreck:          { icon: '♥', role: '체력',  color: '#ff6699' },                 // 점진 채굴 — 첫 히트 heart
         stardust:       { icon: '✦', role: '부스트', color: '#c98bff' },                // Full HP=가속+무적 / 손상=heal
-        asteroid:       { icon: '◆', role: '포탄',  color: '#9a86b0' },                 // Kinetic — 맞히면 적에게 돌진
+        asteroid:       { icon: '☄', role: '충돌',  color: '#ff5a2a', danger: true },   // 접촉=피해(위험) / 쏘면 적에게 돌진
         blackhole:      { icon: '⚠', role: '흡입',  color: '#ff2a6d', danger: true },   // 인력장 — 빨려들어감(위험)
         lantern:        { icon: '❄', role: '강화',  color: '#05d9e8' },                 // 공속+30% + 적 감속 지대
         pressure_plate: { icon: '◉', role: '함정',  color: '#ffaa00', danger: true },   // 접촉=노바 폭발(-1 HP)

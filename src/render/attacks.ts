@@ -48,39 +48,44 @@ export function drawAttackFx(ctx: CanvasRenderingContext2D, cx: number, cy: numb
 
     switch (f.kind) {
       case 'claw': {
-        // ⭐ 메이플스토리 '매직클로' 풍 — 두 갈래 발톱 에너지가 살짝 V 로 벌어져 앞으로 짧게
-        //   쏘아졌다 사라진다. 각 갈래 = 곡선 3-prong 발톱. 선두 밝은 팁 + 꼬리 모션블러로
-        //   '쐈다' 느낌. startR→endR 전진(짧은 사거리, 범위 유지). 빠르고 펀치감 있게.
+        // ⭐ 교차 X 발톱 — 앞으로 '발사'되는 게 아니라 공격 방향 앞을 두 대각선(↘ + ↗)이
+        //   빠르게 시간차로 긁는다(샥-샥). 두 줄이 X 로 교차 = 할퀴기 갈퀴 자국.
+        //   각 대각선 = 3-prong 발톱 마크 + 선두 흰 스파크. 제자리 rake (범위 80 유지).
         const reach = f.range;
-        const travel = Math.min(1, k * 1.5);                 // 앞으로 전진(후반은 정지)
-        const headR = reach * (0.34 + 0.66 * travel);        // 발톱 선두 위치
-        const tailR = reach * (0.10 + 0.50 * travel);        // 꼬리(모션블러 시작)
-        const fade = k < 0.5 ? 1 : 1 - (k - 0.5) / 0.5;      // 후반 페이드아웃
-        for (const side of [-1, 1]) {                        // 두 갈래 (V 스프레드)
-          const base = side * 0.21;
+        const near = reach * 0.14, far = reach * 0.94, half = reach * 0.5;
+        // 두 스트로크의 개별 시간창 (겹치는 구간에서 X 가 형성됨)
+        const win: [number, number][] = [[0.0, 0.55], [0.30, 1.0]];
+        for (let s = 0; s < 2; s++) {
+          const [w0, w1] = win[s];
+          if (k < w0 || k > w1) continue;
+          const sk = (k - w0) / (w1 - w0);                   // 0..1 이 스트로크 진행
+          const draw = Math.min(1, sk / 0.28);               // 앞 28% 동안 빠르게 그어짐
+          const sfade = sk < 0.28 ? 1 : 1 - (sk - 0.28) / 0.72;
+          const ydir = s === 0 ? 1 : -1;                     // ↘ 먼저, ↗ 나중
+          // near→far 로 그어지는 대각선 (y 는 -half→+half, ydir 로 방향 반전)
+          const x0 = near, y0 = -half * ydir;
+          const x1 = near + (far - near) * draw;
+          const y1 = (-half + half * 2 * draw) * ydir;
+          const segAng = Math.atan2(y1 - y0, x1 - x0);
+          const nx = -Math.sin(segAng), ny = Math.cos(segAng); // 진행 수직 (3-prong 오프셋용)
           for (let n = -1; n <= 1; n++) {                    // 발톱 3-prong
-            const off = base + n * 0.075;
-            ctx.lineWidth = (3 + (n === 0 ? 1.6 : 0)) * (0.4 + fade * 0.6);
+            const noff = n * reach * 0.09;
+            ctx.lineWidth = (n === 0 ? 4.5 : 2.6) * (0.5 + sfade * 0.5);
             ctx.lineCap = 'round';
-            ctx.globalAlpha = alpha * fade * (n === 0 ? 1 : 0.78);
-            const hx = Math.cos(off) * headR, hy = Math.sin(off) * headR;
-            const ta = off - side * 0.06;                    // 꼬리는 살짝 안쪽으로 휘어
-            const tx = Math.cos(ta) * tailR, ty = Math.sin(ta) * tailR;
-            const ma = (off + ta) * 0.5, mr = (headR + tailR) * 0.5;
-            const mx = Math.cos(ma) * mr * 1.05, my = Math.sin(ma) * mr * 1.05;
+            ctx.globalAlpha = alpha * sfade * (n === 0 ? 1 : 0.7);
             ctx.beginPath();
-            ctx.moveTo(tx, ty);
-            ctx.quadraticCurveTo(mx, my, hx, hy);
+            ctx.moveTo(x0 + nx * noff, y0 + ny * noff);
+            ctx.lineTo(x1 + nx * noff, y1 + ny * noff);
             ctx.stroke();
           }
-          // 선두 에너지 팁 — 밝은 흰 점 (쏘아지는 느낌)
-          if (fade > 0.35) {
+          // 선두 흰 스파크 (긁히는 끝점)
+          if (sfade > 0.4) {
             ctx.fillStyle = '#fff';
-            ctx.globalAlpha = alpha * fade;
-            const tx = Math.cos(base) * headR, ty = Math.sin(base) * headR;
+            ctx.globalAlpha = alpha * sfade;
             ctx.beginPath();
-            ctx.arc(tx, ty, 2.6, 0, Math.PI * 2);
+            ctx.arc(x1, y1, 2.4, 0, Math.PI * 2);
             ctx.fill();
+            ctx.fillStyle = f.color;
           }
         }
         ctx.globalAlpha = alpha;

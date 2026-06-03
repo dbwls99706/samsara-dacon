@@ -187,6 +187,51 @@ describe('asteroid kinetic momentum', () => {
   });
 });
 
+describe('asteroid 파괴 후 접촉 데미지 잔존 버그 (회귀)', () => {
+  // 🔴 사용자 발견: "포탄 부쉈는데 뭔가 남아서 죽음". 파괴된 prop 이 1초 파괴 애니 동안
+  //    world.props 에 남아 접촉 데미지를 계속 줬음 → tickProps 가 destroyedAt prop 을 즉시 스킵.
+  it('파괴된(destroyedAt) asteroid 는 파괴 애니 동안 플레이어에게 접촉 데미지를 주지 않는다', () => {
+    // Arrange — asteroid 를 플레이어와 겹치게 배치 후 파괴 표시
+    const { world, state, prop } = freshWithProp('asteroid', 20, 2, { x: 0, y: 0 });
+    world.player.pos.x = 0; world.player.pos.y = 0;
+    prop.destroyedAt = 50; prop.hp = 0;
+    // Act — 파괴 애니 윈도(<1초) 동안 여러 틱, 매 틱 무적 강제 해제
+    let events: any[] = [];
+    for (let i = 0; i < 10; i++) {
+      world.player.invulnUntil = 0; world.dashUntil = 0;
+      events = events.concat(tickWorld(world, 0.02, 100 + i * 20, state, { x: 0, y: 0 }, applyWeapons));
+    }
+    // Assert — asteroid 접촉 playerHit 0 건
+    expect(events.filter(e => e.type === 'playerHit' && e.payload?.kind === 'asteroid')).toHaveLength(0);
+  });
+
+  it('파괴되지 않은 asteroid 는 접촉 시 데미지를 준다 (causation 가드)', () => {
+    const { world, state, prop } = freshWithProp('asteroid', 20, 2, { x: 0, y: 0 });
+    world.player.pos.x = 0; world.player.pos.y = 0;
+    world.player.invulnUntil = 0; world.dashUntil = 0;
+    expect(prop.destroyedAt).toBeUndefined();
+    const events = tickWorld(world, 0.02, 100, state, { x: 0, y: 0 }, applyWeapons);
+    expect(events.filter(e => e.type === 'playerHit' && e.payload?.kind === 'asteroid').length).toBeGreaterThan(0);
+  });
+});
+
+describe('shrine 기도 중 무기 면역 (Pray Mode 사용 가능 보장)', () => {
+  // 🔴 사용자 발견: 자동 발톱이 기도 중 shrine 을 부숴 Pray Mode 가 사실상 불가했음.
+  it('기도 진행 중(prayProgress>0)인 shrine 은 발톱 부채꼴에 파괴되지 않는다', () => {
+    const { world, state, prop } = freshWithProp('shrine', 50);
+    // 기도 시작 상태로 진입 — 40px 거리(<60 PRAY_R), 정지
+    world.player.pos.x = prop.pos.x - 40; world.player.pos.y = prop.pos.y;
+    let events: any[] = [];
+    for (let i = 0; i < 200; i++) {
+      world.player.vel.x = 0; world.player.vel.y = 0;
+      events = events.concat(tickWorld(world, 0.02, 100 + i * 20, state, { x: 0, y: 0 }, applyWeapons));
+    }
+    // 발톱이 계속 때렸지만 기도 면역으로 파괴되지 않고 기도 완료
+    expect(prop.destroyedAt).toBeUndefined();
+    expect(prop.prayerCompleted).toBe(true);
+  });
+});
+
 describe('lantern Stronghold + Tragedy', () => {
   it('플레이어가 80px 내 진입 시 buffHasteUntil 갱신', () => {
     const { world, state, prop } = freshWithProp('lantern', 999);

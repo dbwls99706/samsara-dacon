@@ -165,6 +165,14 @@ const SOLID_KINDS = new Set<PropKind>(['monolith', 'rocks', 'ruins', 'mirror_sha
 // 파괴 가능 prop set — 발사체/영역효과가 데미지 줄 수 있음
 export const DESTRUCTIBLE_KINDS = new Set<PropKind>(['shrine', 'wreck', 'asteroid', 'monolith', 'rocks', 'ruins', 'beacon', 'cursed_totem']);
 
+// 🔴 기도(Pray) 진행 중인 shrine 은 플레이어 무기 데미지 면역.
+//   파괴 모드 ↔ 기도 모드는 상호 배타(Stag Hunt) 인데, 자동 무기(발톱 등)가 기도 중
+//   shrine 을 부숴 Pray Mode 를 사실상 못 쓰던 잠복 버그. 기도에 commit 하면 보호된다.
+//   (멀어지면 prayProgress 가 decay→0 되어 다시 파괴 가능.)
+export function isPropWeaponImmune(p: WorldProp): boolean {
+  return p.kind === 'shrine' && (p.prayProgress ?? 0) > 0;
+}
+
 export interface WorldProp {
   id: number;
   kind: PropKind;
@@ -972,6 +980,15 @@ function tickProps(world: World, dt: number, t: number, events: WorldEvent[]) {
     const p = world.props[i];
     p.cooldown = Math.max(0, p.cooldown - dt);
 
+    // 🔴 파괴된 prop: 1초 파괴 애니 동안 world.props 에 남아있다가 제거됨.
+    //   그동안 상호작용 로직(asteroid 접촉 데미지·blackhole 인력 등)이 계속 돌면
+    //   "부쉈는데 뭔가 남아서 죽음" 발생 → 파괴 순간 모든 상호작용 즉시 중단 + 1초 후 제거.
+    //   (보상은 destroyProp 에서 이미 동기 지급 완료 — 더 틱할 것 없음.)
+    if (p.destroyedAt) {
+      if (t - p.destroyedAt > 1000) world.props.splice(i, 1);
+      continue;
+    }
+
     // 거리/방향 (플레이어 기준)
     const dx = player.pos.x - p.pos.x;
     const dy = player.pos.y - p.pos.y;
@@ -1050,17 +1067,20 @@ function tickProps(world: World, dt: number, t: number, events: WorldEvent[]) {
           p.prayProgress = Math.max(0, (p.prayProgress ?? 0) - dt * 0.5);
         }
         // 영역 효과 (오라/노바) 데미지 — 발사체 충돌은 발사체 루프에서 처리 (이동 후 정확)
-        for (const a of world.areaEffects) {
-          const adx = a.pos.x - p.pos.x;
-          const ady = a.pos.y - p.pos.y;
-          const ad = Math.hypot(adx, ady);
-          if (ad < a.radius + p.radius) {
-            const last = a.lastHit.get(p.id + 200000) ?? 0;
-            if (t - last >= a.hitInterval * 1000) {
-              a.lastHit.set(p.id + 200000, t);
-              p.hp -= a.damage;
-              p.hitFlashUntil = t + 100;
-              if (p.hp <= 0) destroyProp(world, p, t, events, 'shrine');
+        //   기도 중이면 면역 (자신의 무기 노바에 부서지지 않게).
+        if (!isPropWeaponImmune(p)) {
+          for (const a of world.areaEffects) {
+            const adx = a.pos.x - p.pos.x;
+            const ady = a.pos.y - p.pos.y;
+            const ad = Math.hypot(adx, ady);
+            if (ad < a.radius + p.radius) {
+              const last = a.lastHit.get(p.id + 200000) ?? 0;
+              if (t - last >= a.hitInterval * 1000) {
+                a.lastHit.set(p.id + 200000, t);
+                p.hp -= a.damage;
+                p.hitFlashUntil = t + 100;
+                if (p.hp <= 0) destroyProp(world, p, t, events, 'shrine');
+              }
             }
           }
         }
@@ -1369,10 +1389,8 @@ function tickProps(world: World, dt: number, t: number, events: WorldEvent[]) {
       }
     }
 
-    // 파괴 후 1초 지나면 prop 제거
-    if (p.destroyedAt && t - p.destroyedAt > 1000) {
-      world.props.splice(i, 1);
-    } else if (p.kind === 'stardust' && p.consumed && t - (p.destroyedAt ?? t) > 600) {
+    // 소비된 stardust 제거 (파괴 prop 은 위 가드에서 처리됨)
+    if (p.kind === 'stardust' && p.consumed && t - (p.destroyedAt ?? t) > 600) {
       world.props.splice(i, 1);
     }
   }
@@ -1982,6 +2000,7 @@ export function tickWorld(world: World, dt: number, t: number, state: GameState,
       for (const prop of world.props) {
         if (prop.hp <= 0 || prop.destroyedAt) continue;
         if (!DESTRUCTIBLE_KINDS.has(prop.kind)) continue;
+        if (isPropWeaponImmune(prop)) continue;  // 기도 중 shrine 보호
         const propKey = prop.id + 100000;
         if (p.hitIds.has(propKey)) continue;
         const dx = prop.pos.x - p.pos.x;

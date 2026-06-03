@@ -6,7 +6,7 @@
 
 import { rng } from './cards.js';
 import type { Card, CardTag, GameState } from './types.js';
-import { DESTRUCTIBLE_KINDS, nearestTarget, spawnAreaEffect, spawnProjectile, type Vec, type World } from './world.js';
+import { DESTRUCTIBLE_KINDS, isPropWeaponImmune, nearestTarget, spawnAreaEffect, spawnProjectile, type Vec, type World } from './world.js';
 import { spawnAttackFx } from '../render/attacks.js';
 
 export interface Weapon {
@@ -86,7 +86,7 @@ function makeClaw(): Weapon {
       //   피격 안 되던 버그). 적이 없으면 nearestTarget 이 프롭을 조준 → 부숨. 부채꼴은 적보다
       //   살짝 넓게(피격 판정 관대 — 게임필). 파괴는 다음 틱 prop 검사에 위임(weapons.ts 패턴).
       for (const p of w.props) {
-        if (p.hp <= 0 || p.destroyedAt || !DESTRUCTIBLE_KINDS.has(p.kind)) continue;
+        if (p.hp <= 0 || p.destroyedAt || !DESTRUCTIBLE_KINDS.has(p.kind) || isPropWeaponImmune(p)) continue;
         const px = p.pos.x - w.player.pos.x;
         const py = p.pos.y - w.player.pos.y;
         const d = Math.hypot(px, py);
@@ -261,7 +261,7 @@ function makeChainLightning(echoLevel: number): Weapon {
           }
         } else {
           const p = w.props.find(pr => pr.id === tgt.id);
-          if (p && p.hp > 0) {
+          if (p && p.hp > 0 && !isPropWeaponImmune(p)) {
             p.hp -= fallDmg;
             p.hitFlashUntil = t + 100;
             if (p.hp <= 0) {
